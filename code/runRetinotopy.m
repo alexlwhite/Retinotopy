@@ -8,7 +8,7 @@ home; clear all;
 %% parameters specific to this session: 
 
 %Increment this number for each scan: 
-scanNum = 2;
+scanNum = 3;
 
 subj = 'XX';
 
