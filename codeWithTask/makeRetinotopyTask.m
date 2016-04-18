@@ -22,6 +22,7 @@ c.task.events = zeros(1,maxEvents);
 
 if length(unique(c.task.whichStim)) == 1
     c.task.events(eventOnsetIs) = c.task.whichStim;
+    c.task.eventTypes = ones(size(eventOnsetIs))*c.task.whichStim;
 elseif length(unique(c.task.whichStim)) == 2
     %make half of them at fixation, half in the peripehry 
     ws = rand(size(eventOnsetIs));

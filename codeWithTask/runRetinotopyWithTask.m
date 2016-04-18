@@ -17,13 +17,11 @@ subj = 'XX';
 
 
 %Increment this number for each scan: 
-scanNum = 2;
+scanNum = 3;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
 scanTypes = {'Rings','Wedges','Meridians'};
-
-
 
 
 doMR           = false; %whether we're running in the magnet (determines calibration file)
