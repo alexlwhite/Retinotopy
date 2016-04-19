@@ -1,11 +1,11 @@
-% c = Rings(display, carrier, time)
+% c = Rings(c)
 %
 % Alex White, using code from Paola Binda & Geoff Boynton
 %
 % For retinotopic mapping, displays the "Rings" stimulus: gradually contracting (or expanding)
 % rings of radial checkerboards.
 %
-% Inputs:
+% Input: structure "c" with the following sub-structure fields: 
 % - display: structure for psychtoolbox screen
 % - carrier: structure with parameters for carrier texture (radial
 % checkerboard)
@@ -17,15 +17,10 @@
 % - c: structure containing all the inputs, as well as c.recorded.onsets,
 % which has time stamps of stimulus onsets
 
-function c = Rings(display, carrier, fixpt, time, task)
+function c = Rings(c)
 
 commandwindow
 
-c.display   = display;
-c.carrier   = carrier;
-c.time      = time;
-c.fixpt     = fixpt; 
-c.task      = task;
 
 %% Stimulus parameters: visible ring
 c.mask.expand       = 0; %ring expands or contracts

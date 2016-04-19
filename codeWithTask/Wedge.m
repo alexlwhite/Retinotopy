@@ -5,8 +5,7 @@
 % For retinotopic mapping, displays the "Wedge" stimulus: rotating wedge of
 % radial checkerboard.
 %
-% Inputs:
-% Inputs:
+% Input: a structure "c" with the following substucture fields: 
 % - display: structure for psychtoolbox screen
 % - carrier: structure with parameters for carrier texture (radial
 % checkerboard)
@@ -21,15 +20,9 @@
 % 
 % %Feb 5 2016: edited so that Wedge starts vertically (c.mask.startAngle = -90)
 
-function c = Wedge(display, carrier, fixpt, time, task);
+function c = Wedge(c)
 
 commandwindow
-
-c.display   = display;
-c.carrier   = carrier;
-c.time      = time;
-c.fixpt     = fixpt; 
-c.task      = task;
 
 %% parameters of the stimuli: visible wedge
 c.mask.widthAngleDeg    = 360/8; %if discrete angles, best if this angle is a whole-number fraction of 360

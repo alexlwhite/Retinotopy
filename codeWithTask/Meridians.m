@@ -1,4 +1,4 @@
-% c = Meridians(display, carrier, time)
+% c = Meridians(c)
 %
 % Alex White, using code from Paola Binda & Geoff Boynton
 %
@@ -19,15 +19,10 @@
 % - c: structure containing all the inputs, as well as c.recorded.onsets,
 % which has time stamps of stimulus onsets
 
-function c = Meridians(display, carrier, fixpt, time, task)
+function c = Meridians(c)
 
 commandwindow
 
-c.display   = display;
-c.carrier   = carrier;
-c.time      = time;
-c.fixpt     = fixpt; 
-c.task      = task;
 
 %% Stimulus parameters: visible wedge
 c.mask.angwidth = 2*pi / 8; %width of wedge in radians
