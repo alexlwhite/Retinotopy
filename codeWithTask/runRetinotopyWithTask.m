@@ -9,11 +9,12 @@
 %April 18 2016: added task! detecting contrast decrements in fixation cross
 %and in checkerboard 
 % Keys: blue for fixation; red for checkerboard
+
 home; clear all;  
 
 %% parameters specific to this session: 
 
-subj = 'XX';
+subj = 'ZZ';
 
 
 %Increment this number for each scan: 
@@ -67,21 +68,28 @@ time.totalScans = nScans;
 %% Task parameters 
 % contrast decrements in either the fixation mark or the checkerboard stimulus
 % Task is just to press button when detected 
+
+task.discriminate = false; %whether you have to make separate responses for event in fixation mark vs. checkerboard
+
 task.minISI = 2; 
 task.maxISI = 12; 
 task.expMean = 5; 
 task.targDur = 0.250;
-task.maxRespDur = 1.5; 
 
-task.buttonNames = {'b','r'};
+if task.discriminate
+    task.buttonNames = {'b','r'};
+    task.maxRespDur = 1.5; 
+else
+    task.buttonNames = {'b','y','g','r'};
+    task.maxRespDur = 1.0; 
+end
 
 task.stimuli = {'fixation','checkerboard'};
 task.whichStim = 1:2; %which stimuli can have decrements: 1=fixation; 2=checkerboard 
 
 % % % task difficulty
-task.fixtnDimProp = 0.2; %luminance of cross reduced by this proportion 
+task.fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
 task.checkerContrastDimProp = 0.55; %contrast of checkerboard reduced by this proportion
-
 
 
 %% fixation mark
@@ -93,8 +101,6 @@ fixpt.crossColor = [fixpt.baseCrossColor; ...
                     round(fixpt.baseCrossColor*(1-task.fixtnDimProp))];
 
 fixpt.crossThick = 3; 
-
-%fixdurs = durtnMultipleOfRefresh(fixMinDur + exprndFree(task.fixExpMean,1,task.numTrials),fps);
 
 %% parameters of carrier texture 
 carrier.nWedges     = 32;   % how many wedges in 360

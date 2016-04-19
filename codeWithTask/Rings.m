@@ -179,7 +179,7 @@ try
                     end
                     c.task.feedback(taskChunk) = 2; %feedback for wrong stimulus/false alarm
                 else
-                    if correctResp == keyPressed %hit 
+                    if correctResp == keyPressed || ~c.task.discriminate %hit 
                         c.task.eventsHit(taskEventNum) = 1;
                         c.task.feedback(c.task.eventFeedbackTime(taskEventNum)) = 3; %feedback for hit
                     else %pressed key at right time, but for wrong stimulus 

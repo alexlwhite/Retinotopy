@@ -15,8 +15,8 @@ eventOnsetTs = eventOnsetTs(eventOnsetTs<c.time.totaldur);
 %round to be in units of time that is checked
 eventOnsetIs = ceil(eventOnsetTs/c.task.timeUnits);
 
-c.task.eventOnsetTs = eventOnsetTs;
 c.task.eventOnsetIs = eventOnsetIs;
+c.task.eventOnsetTs = eventOnsetIs*c.task.timeUnits;
 c.task.eventTypes = zeros(size(eventOnsetIs));
 c.task.events = zeros(1,maxEvents); 
 
