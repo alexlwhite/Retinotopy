@@ -9,6 +9,17 @@
 %April 18 2016: added task! detecting contrast decrements in fixation cross
 %and in checkerboard 
 % Keys: blue for fixation; red for checkerboard
+% 
+% April 19: now you don't have to discriminate location (checkerboard vs
+% fixation) of dimming, just press any key when you detect any dimming. 
+% 
+% To do: 
+% - make subfunctions for routines used in all three stimuli (collecting
+% response, computing accuracy, determining "chunks" 
+% - move other parameters of "masks" for each stimulus into the Params
+% function 
+
+
 
 home; clear all;  
 
@@ -62,7 +73,9 @@ display.bkColor = floor(255*[1 1 1]*0.5);
 
 c = RetinotopyWithTaskParams(display); 
 
-% % % task difficulty
+c.time.totalScans = nScans;
+
+%% set task difficulty
 c.task.fixtnDimProp = fixtnDimProp; %luminance of cross reduced by this proportion 
 c.task.checkerContrastDimProp = checkerContrastDimProp; %contrast of checkerboard reduced by this proportion
 
@@ -70,9 +83,6 @@ c.fixpt.crossColor = [c.fixpt.baseCrossColor; ...
                     round(c.fixpt.baseCrossColor*(1-c.task.fixtnDimProp))];
 
 c.carrier.contrast    = [c.carrier.baseContrast c.carrier.baseContrast*(1-c.task.checkerContrastDimProp)];
-
-c.time.totalScans = nScans;
-
 
 %% loop through scans (or don't loop, just run scan number scanNum)
 
