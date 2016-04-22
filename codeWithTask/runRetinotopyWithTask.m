@@ -36,9 +36,10 @@ scanOrder = [1 2 3 1 2 3];
 scanTypes = {'Rings','Wedges','Meridians'};
 
 
-MRI           = false; %whether we're running in the magnet (determines calibration file)
+MRI            = false; %whether we're running in the magnet (determines calibration file)
 TR             = 2;     %s
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
+
 nScans = length(scanOrder);
 
 %% Should we do eye-tracking?
@@ -46,9 +47,8 @@ nScans = length(scanOrder);
 EYE = 0;  
 
 %% Task difficulty 
-% % % task difficulty
 fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = 0.55; %contrast of checkerboard reduced by this proportion
+checkerContrastDimProp = 0.45; %contrast of checkerboard reduced by this proportion
 
 %% set directories
 xFolder = '/Users/alexwhite/Dropbox/PROJECTS/Retinotopy';
@@ -72,7 +72,6 @@ display.waitDummyScans = waitDummyScans;
 display.open = false;
 
 
-
 %% Load parameters 
 
 c = RetinotopyWithTaskParams(display); 
@@ -80,10 +79,10 @@ c = RetinotopyWithTaskParams(display);
 c.EYE = EYE;
 c.MRI = MRI;
 
-c.totalScans = nScans;
+c.totalScans       = nScans;
 c.subj             = subj;
 c.sessionScanOrder = scanOrder;
-   
+  
 
 %% set task difficulty
 c.task.fixtnDimProp = fixtnDimProp; %luminance of cross reduced by this proportion 

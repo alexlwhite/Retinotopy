@@ -25,13 +25,8 @@ commandwindow
 
 
 %% Stimulus parameters: visible wedge
-c.mask.angwidth = 2*pi / 8; %width of wedge in radians
-c.mask.clockwise = 1;
-c.mask.Angles = [0 90]; % tested orientations
+c.mask = c.meridsMask;
 
-if ~c.mask.clockwise
-    c.mask.Angles = c.mask.Angles(end:-1:1);
-end
 
 %% make task events
 c = makeRetinotopyTask(c);

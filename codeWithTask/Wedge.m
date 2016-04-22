@@ -25,16 +25,8 @@ function c = Wedge(c)
 commandwindow
 
 %% parameters of the stimuli: visible wedge
-c.mask.widthAngleDeg    = 360/8; %if discrete angles, best if this angle is a whole-number fraction of 360
-c.mask.widthAngle       = c.mask.widthAngleDeg*pi/180;
-c.mask.clockwise        = 1;
-c.mask.discreteAngles   = 0; % if 0 continuous rotation (360 deg in one cycle)
-c.mask.startAngle       = -90; %start vertically 
-if c.mask.discreteAngles
-    c.mask.Angles = 0:c.mask.widthAngleDeg:(360-c.mask.widthAngleDeg);
-else
-    c.mask.Angles = NaN;
-end
+
+c.mask = c.wedgeMask; % load parameters of mask from preset wedgeMask;
 
 if ~c.mask.clockwise
     c.mask.Angles = c.mask.Angles(end:-1:1);

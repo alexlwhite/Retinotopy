@@ -23,10 +23,9 @@ commandwindow
 
 
 %% Stimulus parameters: visible ring
-c.mask.expand       = 0; %ring expands or contracts
-c.mask.thickNRings  = 3; %thickness of carrier in number of rings
-c.mask.nRings       = c.carrier.nRings-c.mask.thickNRings+1;
 
+c.mask              = c.ringsMask; %load parameters for mask preset in c.ringsMask
+c.mask.nRings       = c.carrier.nRings-c.mask.thickNRings+1;
 c.time.nConds       = c.mask.nRings;
 
 %% make task events

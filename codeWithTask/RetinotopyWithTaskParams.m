@@ -57,6 +57,35 @@ carrier.baseContrast = 0.90;
 %the longest dimension. 
 carrier.fitInScreen = false; 
 
+
+%% parameters for masks (which determine shape of checkerboard segments for each stimulus type) 
+
+% % % Rings: 
+ringsMask.expand       = 0; %ring expands or contracts
+ringsMask.thickNRings  = 3; %thickness of carrier in number of rings
+
+% % % Wedge: 
+wedgeMask.widthAngleDeg    = 360/8; %if discrete angles, best if this angle is a whole-number fraction of 360
+wedgeMask.widthAngle       = wedgeMask.widthAngleDeg*pi/180;
+wedgeMask.clockwise        = 1;
+wedgeMask.discreteAngles   = 0; % if 0 continuous rotation (360 deg in one cycle)
+wedgeMask.startAngle       = -90; %start vertically 
+if wedgeMask.discreteAngles
+    wedgeMask.Angles = 0:wedgeMask.widthAngleDeg:(360-wedgeMask.widthAngleDeg);
+else
+    wedgeMask.Angles = NaN;
+end
+
+% % % Meridians
+meridsMask.widthAngleDeg    = 360/8; %if discrete angles, best if this angle is a whole-number fraction of 360
+meridsMask.angwidth = meridsMask.widthAngleDeg*pi/180; %width of wedge in radians
+meridsMask.clockwise = 1;
+meridsMask.Angles = [0 90]; % tested orientations
+
+if ~meridsMask.clockwise
+    meridsMask.Angles = meridsMask.Angles(end:-1:1);
+end
+
 %% eyetracking 
 c.startRecordingTime = 0.050;
 %calibration area
@@ -68,8 +97,11 @@ c.calibShrink = 1;
 display.bkColor = floor(255*[1 1 1]*0.5); 
 display.fgColor = [255 255 255]; %white 
 %% aggregate all sub-structures: 
-c.display   = display; 
-c.carrier   = carrier;
-c.time      = time;
-c.fixpt     = fixpt; 
+c.display    = display; 
+c.carrier    = carrier;
+c.ringsMask  = ringsMask;
+c.wedgeMask  = wedgeMask;
+c.meridsMask = meridsMask;
+c.time       = time;
+c.fixpt      = fixpt; 
 c.task      = task;
