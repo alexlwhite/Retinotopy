@@ -13,12 +13,7 @@
 % April 19: now you don't have to discriminate location (checkerboard vs
 % fixation) of dimming, just press any key when you detect any dimming. 
 % 
-% To do: 
-% - make subfunctions for routines used in all three stimuli (collecting
-% response, computing accuracy, determining "chunks" 
-% - move other parameters of "masks" for each stimulus into the Params
-% function 
-% - add eyetracking! 
+
 
 
 
@@ -47,8 +42,8 @@ nScans = length(scanOrder);
 EYE = 0;  
 
 %% Task difficulty 
-fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = 0.45; %contrast of checkerboard reduced by this proportion
+fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = 0.4; %contrast of checkerboard reduced by this proportion
 
 %% set directories
 xFolder = '/Users/alexwhite/Dropbox/PROJECTS/Retinotopy';
@@ -108,12 +103,7 @@ for si = scanNum
    
    switch scanOrder(si)
        case 1
-           try
-               stim = Rings(c);
-           catch me
-               sca
-               keyboard
-           end
+           stim = Rings(c);
        case 2
            stim = Wedge(c);
        case 3

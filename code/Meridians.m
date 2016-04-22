@@ -61,20 +61,8 @@ try
     Mask_TxtPtr = Screen('MakeTexture', c.display.windowPtr, img);
     
     %% make fixation point
-    %background circle
-    c.fixpt.pos = myPix([0 0],[],c.display);
-    c.fixpt.size = myPix([],[c.fixpt.sizeDeg],c.display);
+    c = makeRetinotopyFixationMark(c); 
     
-    angles = [0 90];
-    allxy = [];
-    for ai = 1:2
-        startxy = myPix([0 0]-0.5*c.fixpt.sizeDeg*[cosd(angles(ai)) sind(angles(ai))],[],c.display);
-        endxy = myPix([0 0]+0.5*c.fixpt.sizeDeg*[cosd(angles(ai)) sind(angles(ai))],[],c.display);
-        %newxy = [startx endx; starty endy];
-        newxy = [startxy' endxy']; 
-        allxy = [allxy newxy];
-    end
-    c.fixpt.allxy = allxy;
     %% Draw text:
     drawRetinotopyTextStart(c,'Meridians');
     
@@ -132,34 +120,8 @@ try
             
             Screen('Flip',c.display.windowPtr);
             
-             % check for keypress 
-            keyPressed = checkTarPress(c.task.buttons);
-   
-            %determine whether this was the correct response given task
-            %events
-            if keyPressed>0
-                if correctResp == 0 %false alarm
-                    %if false alarm not already recorded in this "chunk",
-                    %record it now
-                    if c.task.feedback(taskChunk) ~= 2; %feedback for wrong stimulus/false alarm
-                        c.task.nFalseAlarm = c.task.nFalseAlarm + 1;
-                        c.task.tFalseAlarm = [c.task.tFalseAlarm elapsedTime];
-                    end
-                    c.task.feedback(taskChunk) = 2; %feedback for wrong stimulus/false alarm
-                else
-                    if correctResp == keyPressed || ~c.task.discriminate %hit 
-                        c.task.eventsHit(taskEventNum) = 1;
-                        c.task.feedback(c.task.eventFeedbackTime(taskEventNum)) = 3; %feedback for hit
-                    else %pressed key at right time, but for wrong stimulus 
-                        c.task.eventsHit(taskEventNum) = -1;
-                        c.task.feedback(c.task.eventFeedbackTime(taskEventNum)) = 2; %feedback for wrong stimulus 
-                    end
-                    %add time of hit: 
-                    if c.task.eventsHit(taskEventNum) == 0
-                        c.task.tHit = [c.task.tHit elapsedTime];
-                    end
-                end
-            end
+             % check for keypress and determine response correctness:
+            c = retinotopyCheckTaskResponse(c, correctResp, taskEventNum, taskChunk, elapsedTime);
             
              %Update time counter and check whether time is up
             t = GetSecs - t0;
@@ -179,15 +141,7 @@ try
     
     %task performance
     lastEvent = max(c.task.respEventIs(1:taskChunk));
-    eHits = c.task.eventsHit(1:lastEvent);
-    eTypes = c.task.eventTypes(1:lastEvent);
-    for tt = c.task.whichStim
-        c.recorded.hitRate(tt) = mean(eHits(eTypes==tt)==1);
-    end
-    
-    %c.recorded.hitRate = mean(c.task.eventsHit==1); 
-    c.recorded.nFalseAlarms = c.task.nFalseAlarm;
-    c.recorded.wrongStimRate = mean(c.task.eventsHit==-1); 
+    c = retinotopyAnalyzeTaskPerformance(c, lastEvent);
 catch myerr
     %this "catch" section executes in case of an error in the "try" section
     %above.  Importantly, it closes the onscreen window if its open.
