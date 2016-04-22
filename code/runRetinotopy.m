@@ -52,7 +52,7 @@ checkerContrastDimProp = 0.45; %contrast of checkerboard reduced by this proport
 
 %% set directories
 xFolder = '/Users/alexwhite/Dropbox/PROJECTS/Retinotopy';
-cFolder = fullfile(xFolder,'codeWithTask');
+cFolder = fullfile(xFolder,'code');
 dFolder = fullfile(xFolder,'data');
 
 addpath(genpath(cFolder));
@@ -74,7 +74,7 @@ display.open = false;
 
 %% Load parameters 
 
-c = RetinotopyWithTaskParams(display); 
+c = retinotopyParams(display); 
 
 c.EYE = EYE;
 c.MRI = MRI;
