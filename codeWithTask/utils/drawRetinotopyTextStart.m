@@ -1,12 +1,12 @@
 function drawRetinotopyTextStart(c,stimType)
 
 textColr = [0 10 255];
-str = sprintf('Scan %i of %i',c.time.scanNum, c.time.totalScans);
+str = sprintf('Scan %i of %i',c.scanNum, c.totalScans);
 ptbDrawText(c.display.windowPtr,str,c.display.center,textColr);
 
 %if there's another screen open (operators screen), draw slightly different text
 if c.display.nScreens==2 && ~c.display.mirrored
-    str = sprintf('Scan %i of %i: %s',c.time.scanNum, c.time.totalScans, stimType);
+    str = sprintf('Scan %i of %i: %s',c.scanNum, c.totalScans, stimType);
     ptbDrawText(c.display.otherWindow,str,c.display.otherCenter,textColr);
     
     str2 = '[press t to start]';

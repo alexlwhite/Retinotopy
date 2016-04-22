@@ -47,6 +47,7 @@ end
 
 if ~isfield(display,'bkColor')
     display.bkColor = [0,0,0]; %black
+    display.fgColor = [1 1 1]; %white
 end
 
 if ~isfield(display,'skipSyncTests')
@@ -100,13 +101,18 @@ else
 end
 
 %Open the window
-[display.windowPtr,res]=Screen('OpenWindow',display.screenNum,display.bkColor);
+[display.windowPtr,display.rect]=Screen('OpenWindow',display.screenNum,display.bkColor);
 %Set the display parameters 'frameRate' and 'resolution'
 display.frameRate = 1/Screen('GetFlipInterval',display.windowPtr); %Hz
 
 if ~isfield(display,'resolution')
-    display.resolution = res([3,4]);
+    display.resolution = display.rect([3,4]);
 end
+
+[display.xres, display.yres]    = Screen('WindowSize',display.windowPtr);       % heigth and width of screen [pix]
+display.ppd = display.dist*tan(1*pi/180)/(display.width/(10*display.xres));	% distance between fixation point and target in pixels
+% determine the main window's center
+[display.centerX, display.centerY] = WindowCenter(display.windowPtr);
 
 display.center = floor(display.resolution/2);
 

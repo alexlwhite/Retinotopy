@@ -57,7 +57,16 @@ carrier.baseContrast = 0.90;
 %the longest dimension. 
 carrier.fitInScreen = false; 
 
+%% eyetracking 
+c.startRecordingTime = 0.050;
+%calibration area
+c.squareCalib = false;
+c.calibShrink = 1; 
 
+%% display
+%Background color 
+display.bkColor = floor(255*[1 1 1]*0.5); 
+display.fgColor = [255 255 255]; %white 
 %% aggregate all sub-structures: 
 c.display   = display; 
 c.carrier   = carrier;

@@ -102,6 +102,40 @@ try
     end
     c.fixpt.allxy = allxy;
     
+     %% setup eyelink
+    %Initialize eyelink:
+    [el, elStatus] = initializeEyelinkRetinotopy(c);
+    
+    if c.EYE > 0
+        if elStatus == 1
+            fprintf(1,'\nEyelink initialized with edf file: %s.edf\n\n',eyelinkFileName);
+        else
+            fprintf(1,'\nError in connecting to eyelink!\n');
+        end
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Calibrate eye-tracker
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if c.EYE > 0
+        
+        calibresult = EyelinkDoTrackerSetup(el);
+        if calibresult==el.TERMINATE_KEY
+            return
+        end
+        
+        
+        %also need to re-load normalized gamma table.
+        %eyelink calibration seems to screw with it
+        BackupCluts;
+        %Re-Load calibration file
+        if ~isempty(c.display.normlzdGammaTable)
+            Screen('LoadNormalizedGammaTable', c.display.windowPtr, c.display.normlzdGammaTable);
+        end
+        
+        Screen('Flip',c.display.windowPtr);                       	% flip to erase
+    end
+    
     %% Draw text:
     drawRetinotopyTextStart(c,'Rings');
     
@@ -115,6 +149,32 @@ try
     runStim = true;
     
     t0 = GetSecs; t = GetSecs - t0;
+    
+    %% Start eyelink recording!
+    record      = c.EYE==-1;
+    if ~record
+        record = startEyelinkRecording(el,c);
+    end
+    
+    %Tell Eyelink that trial is starting 
+    if c.EYE>-1
+        Eyelink('command','clear_screen');
+        
+        if c.EYE>0
+            if Eyelink('isconnected')==el.notconnected
+                fprintf(1,'\n\n\n\nWARNING! EYELINK CONNECTION LOST\n\n\n');
+                if ~c.MRI %cancel if eyeLink is not connected
+                    return
+                end
+            end
+        end
+        
+        % This supplies a title at the bottom of the eyetracker display
+        Eyelink('command', 'record_status_message ''Retinotopy Rings Scan %d''', c.scanNum);
+
+    end
+    
+    %% run stimulus
     while runStim 
         escape = escPressed(c.display.keybs);
         if ~escape             
@@ -149,6 +209,7 @@ try
                     
                     if isnan(c.recorded.onsets(thisCycle,thisCond))
                         c.recorded.onsets(thisCycle,thisCond) = elapsedTime;
+                        Eyelink('message', 'Onset of condition %d in cycle number %d', thisCond, thisCycle);
                     end
                 end
             end
@@ -203,6 +264,18 @@ try
     c.recorded.stimStart = c.recorded.onsets(1);
     c.recorded.stimDurtn = c.recorded.stimEnd - c.recorded.stimStart;
     
+     % end eye-movement recording
+    if c.EYE>0
+        Screen(el.window,'FillRect',el.backgroundcolour);   % hide display
+        Eyelink('stoprecording');
+        Screen('Flip',c.display.windowPtr);
+        Eyelink('command','clear_screen');
+        Eyelink('command', 'record_status_message ''ENDE''');
+
+        %move edf file to data folder
+        [success, message] = movefile(sprintf('%s.edf',c.edfFileName),sprintf('%s.edf',c.datFileName));
+    end
+    
     %task performance
     lastEvent = max(c.task.respEventIs(1:taskChunk));
     eHits = c.task.eventsHit(1:lastEvent);
@@ -221,6 +294,7 @@ catch myerr
     commandwindow;
     myerr.message
     myerr.stack.line
+    keyboard
     
 end %try..catch.
 

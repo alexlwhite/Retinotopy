@@ -18,6 +18,7 @@
 % response, computing accuracy, determining "chunks" 
 % - move other parameters of "masks" for each stimulus into the Params
 % function 
+% - add eyetracking! 
 
 
 
@@ -28,18 +29,21 @@ home; clear all;
 subj = 'ZZ';
 
 %Increment this number for each scan: 
-scanNum = 6;
+scanNum = 1;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
 scanTypes = {'Rings','Wedges','Meridians'};
 
 
-doMR           = false; %whether we're running in the magnet (determines calibration file)
+MRI           = false; %whether we're running in the magnet (determines calibration file)
 TR             = 2;     %s
-
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
 nScans = length(scanOrder);
+
+%% Should we do eye-tracking?
+%-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
+EYE = 0;  
 
 %% Task difficulty 
 % % % task difficulty
@@ -55,25 +59,31 @@ addpath(genpath(cFolder));
 cd(cFolder);
 
 %% monitor information 
-if doMR
+if MRI
     load('display_scanner.mat');
 else
     %load('display_home.mat');
     load('display_office74.mat');
+    %load('display_coombsFromLaptop.mat');
 end
 
 display.TR = TR;
 display.waitDummyScans = waitDummyScans;
 display.open = false;
 
-%Background color 
-display.bkColor = floor(255*[1 1 1]*0.5); 
+
 
 %% Load parameters 
 
 c = RetinotopyWithTaskParams(display); 
 
-c.time.totalScans = nScans;
+c.EYE = EYE;
+c.MRI = MRI;
+
+c.totalScans = nScans;
+c.subj             = subj;
+c.sessionScanOrder = scanOrder;
+   
 
 %% set task difficulty
 c.task.fixtnDimProp = fixtnDimProp; %luminance of cross reduced by this proportion 
@@ -87,11 +97,24 @@ c.carrier.contrast    = [c.carrier.baseContrast c.carrier.baseContrast*(1-c.task
 %% loop through scans (or don't loop, just run scan number scanNum)
 
 for si = scanNum
-   c.time.scanNum = si; 
+   c.scanNum = si;
+   c.type             = scanTypes{scanOrder(si)};
+
+   
+   %chose name for this scan's data file
+   [datFile, edfFile] = setupRetinoDatFile(si,scanTypes{scanOrder(si)},subj,dFolder);
+    
+   c.edfFileName = edfFile;
+   c.datFileName = datFile;
    
    switch scanOrder(si)
        case 1
-           stim = Rings(c);
+           try
+               stim = Rings(c);
+           catch me
+               sca
+               keyboard
+           end
        case 2
            stim = Wedge(c);
        case 3
@@ -101,13 +124,6 @@ for si = scanNum
    %carry over display parameters, to allow screen to stay open
    c.display = stim.display; 
    
-   %save stimulus info for this scan:
-   stim.subj             = subj;
-   stim.scanNum          = si;
-   stim.sessionScanOrder = scanOrder;
-   stim.type             = scanTypes{scanOrder(si)};
-   stim.doMR             = doMR;
-   
    fprintf(1,'\nscan %i duration = %.3f\n',si, stim.recorded.stimDurtn);
    for tt = c.task.whichStim
        fprintf(1,'\nFor %s stimulus, hit rate = %.3f\n',c.task.stimuli{tt}, stim.recorded.hitRate(tt));
@@ -116,8 +132,6 @@ for si = scanNum
    fprintf(1,'\nNumber false alarms = %i\n',stim.recorded.nFalseAlarms);
 
    
-   %chose name for this scan's data file
-   datFile = setupRetinoDatFile(si,scanTypes{scanOrder(si)},subj,dFolder);
    
    %save data mat file
    save(sprintf('%s.mat',datFile),'stim');

@@ -1,4 +1,4 @@
-function datFile = setupRetinoDatFile(scanNum,scanType,subj,dFolder)
+function [datFile, eyelinkFileName]= setupRetinoDatFile(scanNum,scanType,subj,dFolder)
 
 %decide what folder to put data in
 thedate=date;
@@ -27,3 +27,5 @@ while ~goodname
     goodname = ~(isfile(sprintf('%s.mat',datFile)) || isfile(sprintf('%s.txt',datFile)) || isfile(sprintf('%s.edf',datFile)));
 end
 
+%eyelink file name
+eyelinkFileName = sprintf('%s%s%i%i',subj,datestr(now,'dd'),scanNum,bn);
