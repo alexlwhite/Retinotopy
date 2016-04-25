@@ -40,6 +40,9 @@ try
         c.display = OpenWindow(c.display);
     end
     
+    % disable keyboard
+    ListenChar(2);
+    
     % initializations
     c.recorded.onsets = NaN(c.time.NCycles,c.time.nConds);
     
@@ -93,7 +96,7 @@ try
     
     if c.EYE > 0
         if elStatus == 1
-            fprintf(1,'\nEyelink initialized with edf file: %s.edf\n\n',eyelinkFileName);
+            fprintf(1,'\nEyelink initialized with edf file: %s.edf\n\n',c.edfFileName);
         else
             fprintf(1,'\nError in connecting to eyelink!\n');
         end
@@ -213,10 +216,11 @@ try
             runStim = t < c.time.totaldur;
 
         else %if escaped, end the stimulus 
-            c.display.open = false;
+            
             c.recorded.escaped = true;
             runStim = false;  %to break out of this while loop
-            sca;
+            %sca; %no need to do that, it happens later anyway
+            %c.display.open = false;
         end
     end
     c.recorded.stimEnd = GetSecs - t0;
@@ -231,6 +235,19 @@ try
         Eyelink('command','clear_screen');
         Eyelink('command', 'record_status_message ''ENDE''');
 
+        status = Eyelink('ReceiveFile');
+        if status == 0
+            fprintf(1,'\n\nFile transfer went pretty well\n\n');
+        elseif status < 0
+            fprintf(1,'\n\nError occurred during file transfer\n\n');
+        else
+            fprintf(1,'\n\nFile has been transferred (%i Bytes)\n\n',status)
+        end
+        
+        % Eyelink runterfahren
+        Eyelink('closefile');
+        Eyelink('shutdown');
+        
         %move edf file to data folder
         [success, message] = movefile(sprintf('%s.edf',c.edfFileName),sprintf('%s.edf',c.datFileName));
     end
@@ -238,7 +255,7 @@ try
     %task performance
     lastEvent = max(c.task.respEventIs(1:taskChunk));
     c = retinotopyAnalyzeTaskPerformance(c, lastEvent);
-
+    ListenChar(1);
 catch myerr
     %this "catch" section executes in case of an error in the "try" section
     %above.  Importantly, it closes the onscreen window if its open.

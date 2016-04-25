@@ -6,25 +6,23 @@
 
 %Feb 5 2016: edited so that Wedge starts vertically (startAngle = -90)
 % 
-%April 18 2016: added task! detecting contrast decrements in fixation cross
-%and in checkerboard 
-% Keys: blue for fixation; red for checkerboard
+% April 18 2016: added task! detecting contrast decrements in fixation cross
+% and in checkerboard 
 % 
 % April 19: now you don't have to discriminate location (checkerboard vs
 % fixation) of dimming, just press any key when you detect any dimming. 
 % 
-
-
-
+% April 22: added eyetracking to Rings
+% 
+% To do: test eyetracking, add similar code to other three 
 
 home; clear all;  
 
 %% parameters specific to this session: 
-
 subj = 'ZZ';
 
 %Increment this number for each scan: 
-scanNum = 1;
+scanNum = 4;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -39,11 +37,12 @@ nScans = length(scanOrder);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = 0;  
+EYE = 1;  
 
 %% Task difficulty 
 fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
 checkerContrastDimProp = 0.4; %contrast of checkerboard reduced by this proportion
+
 
 %% set directories
 xFolder = '/Users/alexwhite/Dropbox/PROJECTS/Retinotopy';
@@ -58,8 +57,8 @@ if MRI
     load('display_scanner.mat');
 else
     %load('display_home.mat');
-    load('display_office74.mat');
-    %load('display_coombsFromLaptop.mat');
+    %load('display_office74.mat');
+    load('display_coombsFromLaptop.mat');
 end
 
 display.TR = TR;
@@ -93,7 +92,6 @@ c.carrier.contrast    = [c.carrier.baseContrast c.carrier.baseContrast*(1-c.task
 for si = scanNum
    c.scanNum = si;
    c.type             = scanTypes{scanOrder(si)};
-
    
    %chose name for this scan's data file
    [datFile, edfFile] = setupRetinoDatFile(si,scanTypes{scanOrder(si)},subj,dFolder);
@@ -119,8 +117,6 @@ for si = scanNum
    end
    fprintf(1,'\nWrong stim rate = %.3f\n', stim.recorded.wrongStimRate);
    fprintf(1,'\nNumber false alarms = %i\n',stim.recorded.nFalseAlarms);
-
-   
    
    %save data mat file
    save(sprintf('%s.mat',datFile),'stim');
