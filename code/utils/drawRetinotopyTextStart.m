@@ -2,7 +2,7 @@ function drawRetinotopyTextStart(c,stimType)
 
 textColr = [0 10 255];
 str = sprintf('Scan %i of %i',c.scanNum, c.totalScans);
-ptbDrawText(c.display.windowPtr,str,c.display.center.*[1 0.75],textColr);
+ptbDrawText(c.display.windowPtr,str,c.display.center.*[1 0.85],textColr);
 
 %draw fixation mark
 Screen('DrawDots',c.display.windowPtr,c.fixpt.pos,c.fixpt.size,c.fixpt.backColor(1,:),[],c.fixpt.type);
