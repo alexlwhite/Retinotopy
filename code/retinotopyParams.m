@@ -90,7 +90,7 @@ end
 c.startRecordingTime = 0.050;
 %calibration area
 c.squareCalib = false;
-c.calibShrink = 1; 
+c.calibShrink = 0.8; 
 
 %% display
 %Background color 
