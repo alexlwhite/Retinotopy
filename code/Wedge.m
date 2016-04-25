@@ -44,6 +44,10 @@ try
         c.display = OpenWindow(c.display);
     end
     
+    % make it so keypresses during experiment dont show up in Matlab
+    % command window or text editor 
+    ListenChar(2);
+    
     % initializations
     c.recorded.onsets = NaN(c.time.NCycles,length(c.mask.Angles));
     
@@ -64,12 +68,69 @@ try
     %% make fixation point
     c = makeRetinotopyFixationMark(c);
     
+     %% setup eyelink
+    %Initialize eyelink:
+    [el, elStatus] = initializeEyelinkRetinotopy(c);
+    
+    if c.EYE > 0
+        if elStatus == 1
+            fprintf(1,'\nEyelink initialized with edf file: %s.edf\n\n',c.edfFileName);
+        else
+            fprintf(1,'\nError in connecting to eyelink!\n');
+        end
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Calibrate eye-tracker
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if c.EYE > 0
+        
+        calibresult = EyelinkDoTrackerSetup(el);
+        if calibresult==el.TERMINATE_KEY
+            return
+        end
+        
+        
+        %also need to re-load normalized gamma table.
+        %eyelink calibration seems to screw with it
+        BackupCluts;
+        %Re-Load calibration file
+        if ~isempty(c.display.normlzdGammaTable)
+            Screen('LoadNormalizedGammaTable', c.display.windowPtr, c.display.normlzdGammaTable);
+        end
+        
+        Screen('Flip',c.display.windowPtr);                       	% flip to erase
+    end
+    
     %% Draw text:
     drawRetinotopyTextStart(c,'Wedge');
     
     %% wait for trigger
     wait4T(c.display.keybs)
     if c.display.nScreens==2 && ~c.display.mirrored, Screen('Flip',c.display.otherWindow); end
+    
+    %% Start eyelink recording!
+    record      = c.EYE==-1;
+    if ~record
+        record = startEyelinkRecording(el,c);
+    end
+    
+    %Tell Eyelink that trial is starting 
+    if c.EYE>-1
+        Eyelink('command','clear_screen');
+        
+        if c.EYE>0
+            if Eyelink('isconnected')==el.notconnected
+                fprintf(1,'\n\n\n\nWARNING! EYELINK CONNECTION LOST\n\n\n');
+                if ~c.MRI %cancel if eyeLink is not connected
+                    return
+                end
+            end
+        end
+        
+        % This supplies a title at the bottom of the eyetracker display
+        Eyelink('command', 'record_status_message ''Retinotopy Rings Scan %d''', c.scanNum);
+    end
     
     %% start counting time
     runStim = true;
@@ -116,10 +177,12 @@ try
                     if c.mask.discreteAngles
                         if isnan(c.recorded.onsets(thisCycle,thisBlock))
                             c.recorded.onsets(thisCycle,thisBlock) = elapsedTime;
+                            if c.EYE>0, Eyelink('message', 'Onset of block %d in cycle number %d', thisBlock, thisCycle); end
                         end
                     else
                         if isnan(c.recorded.onsets(thisCycle,1))
                             c.recorded.onsets(thisCycle,1) = elapsedTime; % record the beginning of the block
+                            if c.EYE>0, Eyelink('message', 'Onset of cycle number %d', thisCycle); end
                         end
                     end
                 end
@@ -138,20 +201,47 @@ try
             runStim = t < c.time.totaldur;
             
         else %if escaped, end the stimulus
-            c.display.open = false;
             c.recorded.escaped = true;
             runStim = false;
-            sca;
+            %sca; no need to do this here 
+            %c.display.open = false;
         end
     end
     c.recorded.stimEnd = GetSecs - t0;
     c.recorded.stimStart = c.recorded.onsets(1);
     c.recorded.stimDurtn = c.recorded.stimEnd - c.recorded.stimStart;
     
+     % end eye-movement recording
+    if c.EYE>0
+        Screen(el.window,'FillRect',el.backgroundcolour);   % hide display
+        Eyelink('stoprecording');
+        Screen('Flip',c.display.windowPtr);
+        Eyelink('command','clear_screen');
+        Eyelink('command', 'record_status_message ''ENDE''');
+
+        status = Eyelink('ReceiveFile');
+        if status == 0
+            fprintf(1,'\n\nFile transfer went pretty well\n\n');
+        elseif status < 0
+            fprintf(1,'\n\nError occurred during file transfer\n\n');
+        else
+            fprintf(1,'\n\nFile has been transferred (%i Bytes)\n\n',status)
+        end
+        
+        % Eyelink runterfahren
+        Eyelink('closefile');
+        Eyelink('shutdown');
+        
+        %move edf file to data folder
+        [success, message] = movefile(sprintf('%s.edf',c.edfFileName),sprintf('%s.edf',c.datFileName));
+    end
+    
     %task performance
     lastEvent = max(c.task.respEventIs(1:taskChunk));
     c = retinotopyAnalyzeTaskPerformance(c, lastEvent);
 
+    %re-enable typing into Matlab 
+    ListenChar(1);
 catch myerr
     %this "catch" section executes in case of an error in the "try" section
     %above.  Importantly, it closes the onscreen window if its open.

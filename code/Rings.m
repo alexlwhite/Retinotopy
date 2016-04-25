@@ -40,7 +40,8 @@ try
         c.display = OpenWindow(c.display);
     end
     
-    % disable keyboard
+    % make it so keypresses during experiment dont show up in Matlab
+    % command window or text editor 
     ListenChar(2);
     
     % initializations
@@ -132,12 +133,6 @@ try
     if c.display.nScreens==2 && ~c.display.mirrored, Screen('Flip',c.display.otherWindow); end
     
     
-    %% start counting time
-    rotationAngle = 0;
-    runStim = true;
-    
-    t0 = GetSecs; t = GetSecs - t0;
-    
     %% Start eyelink recording!
     record      = c.EYE==-1;
     if ~record
@@ -162,6 +157,12 @@ try
 
     end
     
+    %% start counting time
+    rotationAngle = 0;
+    runStim = true;
+    
+    t0 = GetSecs; t = GetSecs - t0;
+        
     %% run stimulus
     while runStim 
         escape = escPressed(c.display.keybs);
@@ -197,7 +198,7 @@ try
                     
                     if isnan(c.recorded.onsets(thisCycle,thisCond))
                         c.recorded.onsets(thisCycle,thisCond) = elapsedTime;
-                        Eyelink('message', 'Onset of condition %d in cycle number %d', thisCond, thisCycle);
+                        if c.EYE>0, Eyelink('message', 'Onset of condition %d in cycle number %d', thisCond, thisCycle); end
                     end
                 end
             end
@@ -255,6 +256,8 @@ try
     %task performance
     lastEvent = max(c.task.respEventIs(1:taskChunk));
     c = retinotopyAnalyzeTaskPerformance(c, lastEvent);
+    
+    %re-enable typing into Matlab 
     ListenChar(1);
 catch myerr
     %this "catch" section executes in case of an error in the "try" section

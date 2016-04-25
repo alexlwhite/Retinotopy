@@ -19,10 +19,10 @@
 home; clear all;  
 
 %% parameters specific to this session: 
-subj = 'ZZ';
+subj = 'ZX';
 
 %Increment this number for each scan: 
-scanNum = 4;
+scanNum = 3;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -37,7 +37,7 @@ nScans = length(scanOrder);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = 1;  
+EYE = -1;  
 
 %% Task difficulty 
 fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
@@ -113,7 +113,7 @@ for si = scanNum
    
    fprintf(1,'\nscan %i duration = %.3f\n',si, stim.recorded.stimDurtn);
    for tt = c.task.whichStim
-       fprintf(1,'\nFor %s stimulus, hit rate = %.3f\n',c.task.stimuli{tt}, stim.recorded.hitRate(tt));
+       fprintf(1,'\nFor %s stimulus, hit rate = %.3f\n',stim.task.stimuli{tt}, stim.recorded.hitRate(tt));
    end
    fprintf(1,'\nWrong stim rate = %.3f\n', stim.recorded.wrongStimRate);
    fprintf(1,'\nNumber false alarms = %i\n',stim.recorded.nFalseAlarms);
