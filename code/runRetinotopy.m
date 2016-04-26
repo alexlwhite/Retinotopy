@@ -19,17 +19,17 @@
 home; clear all;  
 
 %% parameters specific to this session: 
-subj = 'ZX';
+subj = 'KB';
 
 %Increment this number for each scan: 
-scanNum = 3;
+scanNum = 6;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
 scanTypes = {'Rings','Wedges','Meridians'};
 
 
-MRI            = false; %whether we're running in the magnet (determines calibration file)
+MRI            = true; %whether we're running in the magnet (determines calibration file)
 TR             = 2;     %s
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
 
@@ -37,7 +37,7 @@ nScans = length(scanOrder);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = -1;  
+EYE = 1;  
 
 %% Task difficulty 
 fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
@@ -57,8 +57,8 @@ if MRI
     load('display_scanner.mat');
 else
     %load('display_home.mat');
-    %load('display_office74.mat');
-    load('display_coombsFromLaptop.mat');
+    load('display_office74.mat');
+    %load('display_coombsFromLaptop.mat');
 end
 
 display.TR = TR;
