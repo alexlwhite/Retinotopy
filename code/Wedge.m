@@ -129,7 +129,7 @@ try
         end
         
         % This supplies a title at the bottom of the eyetracker display
-        Eyelink('command', 'record_status_message ''Retinotopy Rings Scan %d''', c.scanNum);
+        Eyelink('command', 'record_status_message ''Retinotopy Wedge Scan %d''', c.scanNum);
     end
     
     %% start counting time
