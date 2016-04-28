@@ -173,7 +173,7 @@ Eyelink('Command', 'clear_screen 0');		% initialize screen on operater PC
 %---------------------------------------%
 % Print to file information on the experiment %
 %---------------------------------------%
-Eyelink('command', 'add_file_preamble_text ''Recorded with DAWords by Alex White''');
+Eyelink('command', 'add_file_preamble_text ''Recorded with Retinotopy Code by Alex White''');
 
 %--------------------------------------------------------%
 % write descriptions of the experiment into the edf-file %
