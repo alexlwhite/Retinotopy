@@ -1,10 +1,10 @@
-%% function c = RetinotopyWithTaskParams()
+%% function c = retinotopyParams()
 % Returns a structure c with fields specifying stimulus and task parameters
 % for Retinotopy experiment 
 % Subfields of c 
 % - time: itself a structure with timing information 
 % - task: itself a structure wihth 
-function c = RetinotopyWithTaskParams(display)
+function c = retinotopyParams(display)
 
 %% Timing parameters
 time.CycleDur   = 32;  % temporal period (s)
@@ -41,7 +41,7 @@ task.whichStim = 1:2; %which stimuli can have decrements: 1=fixation; 2=checkerb
 %% fixation mark
 fixpt.type = 2; %0 (default) squares, 1 circles (with anti-aliasing), 2 circles (with high-quality anti-aliasing, if supported by your hardware). If you use dot_type = 1 you'll also need to set a proper blending mode with the Screen('BlendFunction') command!
 fixpt.sizeDeg = 0.3; 
-fixpt.backColor = [0 0 200; 150 150 0; 255 0 0; 0 255 0]; %1=base; 2=miss; 3=error; 4=hit 
+fixpt.backColor = [0 0 200; 255 0 0; 255 0 0; 0 255 0]; %1=base; 2=miss; 3=error; 4=hit 
 fixpt.baseCrossColor  = [200 200 200];
 
 fixpt.crossThick = 3; 

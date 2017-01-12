@@ -12,24 +12,22 @@
 % April 19: now you don't have to discriminate location (checkerboard vs
 % fixation) of dimming, just press any key when you detect any dimming. 
 % 
-% April 22: added eyetracking to Rings
-% 
-% To do: test eyetracking, add similar code to other three 
+% April 22-26 2016: added eyetracking  
 
 home; clear all;  
 
 %% parameters specific to this session: 
-subj = 'KB';
+subj = 'ZZ';
 
 %Increment this number for each scan: 
-scanNum = 6;
+scanNum = 3;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
 scanTypes = {'Rings','Wedges','Meridians'};
 
 
-MRI            = true; %whether we're running in the magnet (determines calibration file)
+MRI            = false; %whether we're running in the magnet (determines calibration file)
 TR             = 2;     %s
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
 
@@ -37,11 +35,11 @@ nScans = length(scanOrder);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = 1;  
+EYE = -1;  
 
 %% Task difficulty 
-fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = 0.4; %contrast of checkerboard reduced by this proportion
+fixtnDimProp = 0.35; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = 0.5; %contrast of checkerboard reduced by this proportion
 
 
 %% set directories
@@ -54,21 +52,20 @@ cd(cFolder);
 
 %% monitor information 
 if MRI
-    load('display_scanner.mat');
+    load('display_scannerHSB.mat');
 else
-    %load('display_home.mat');
     load('display_office74.mat');
-    %load('display_coombsFromLaptop.mat');
+    load('display_macbook.mat');
 end
 
-display.TR = TR;
-display.waitDummyScans = waitDummyScans;
-display.open = false;
+displayParams.TR = TR;
+displayParams.waitDummyScans = waitDummyScans;
+displayParams.open = false;
 
 
 %% Load parameters 
 
-c = retinotopyParams(display); 
+c = retinotopyParams(displayParams); 
 
 c.EYE = EYE;
 c.MRI = MRI;
@@ -108,7 +105,7 @@ for si = scanNum
            stim = Meridians(c);
    end
    
-   %carry over display parameters, to allow screen to stay open
+   %carry over displayParams parameters, to allow screen to stay open
    c.display = stim.display; 
    
    fprintf(1,'\nscan %i duration = %.3f\n',si, stim.recorded.stimDurtn);
