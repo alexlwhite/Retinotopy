@@ -162,9 +162,14 @@ try
                 taskEventNum = c.task.respEventIs(taskChunk);
                 taskFeedback = c.task.feedback(taskChunk);
                 
-                fixtnColorI = 1 + taskFeedback;
-                crossColorI = 1 + (taskEvent == 1); 
+                %fixation color indices:
+                outerColorI = 1 + taskFeedback;
+                innerColorI = 1 + (taskEvent == 1); 
+                
+                %checkerborad contrast index
                 carrierContrastI = 1 + (taskEvent == 2);
+                
+                %What correct resp is for this segment:
                 correctResp = c.task.correctResps(taskChunk);
                 
                 if thisCycle <= c.time.NCycles
@@ -188,9 +193,7 @@ try
                 end
             end
             %draw fixation mark 
-            Screen('DrawDots',c.display.windowPtr,c.fixpt.pos,c.fixpt.size,c.fixpt.backColor(fixtnColorI,:),[],c.fixpt.type);           
-            Screen('DrawLines',c.display.windowPtr, c.fixpt.allxy, c.fixpt.crossThick, c.fixpt.crossColor(crossColorI,:),[],c.fixpt.type); 
-   
+            drawFixation_Retinotopy(c, innerColorI, outerColorI);
             Screen('Flip',c.display.windowPtr);
             
             % check for keypress and determine response correctness:

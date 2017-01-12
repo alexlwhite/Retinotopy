@@ -20,7 +20,7 @@ home; clear all;
 subj = 'ZZ';
 
 %Increment this number for each scan: 
-scanNum = 3;
+scanNum = 2;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -55,7 +55,7 @@ if MRI
     load('display_scannerHSB.mat');
 else
     load('display_office74.mat');
-    load('display_macbook.mat');
+    %load('display_macbook.mat');
 end
 
 displayParams.TR = TR;
@@ -79,9 +79,7 @@ c.sessionScanOrder = scanOrder;
 c.task.fixtnDimProp = fixtnDimProp; %luminance of cross reduced by this proportion 
 c.task.checkerContrastDimProp = checkerContrastDimProp; %contrast of checkerboard reduced by this proportion
 
-c.fixpt.crossColor = [c.fixpt.baseCrossColor; ...
-                    round(c.fixpt.baseCrossColor*(1-c.task.fixtnDimProp))];
-
+c.fixpt.colors(2,:) = round(c.fixpt.baseColor*(1-c.task.fixtnDimProp));
 c.carrier.contrast    = [c.carrier.baseContrast c.carrier.baseContrast*(1-c.task.checkerContrastDimProp)];
 
 %% loop through scans (or don't loop, just run scan number scanNum)

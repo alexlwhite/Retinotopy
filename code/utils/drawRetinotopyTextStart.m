@@ -5,9 +5,7 @@ str = sprintf('Scan %i of %i',c.scanNum, c.totalScans);
 ptbDrawText(c.display.windowPtr,str,c.display.center.*[1 0.85],textColr);
 
 %draw fixation mark
-Screen('DrawDots',c.display.windowPtr,c.fixpt.pos,c.fixpt.size,c.fixpt.backColor(1,:),[],c.fixpt.type);
-Screen('DrawLines',c.display.windowPtr, c.fixpt.allxy, c.fixpt.crossThick, c.fixpt.crossColor(1,:),[],c.fixpt.type);
-
+drawFixation_Retinotopy(c,1,1);
 
 %if there's another screen open (operators screen), draw slightly different text
 if c.display.nScreens==2 && ~c.display.mirrored

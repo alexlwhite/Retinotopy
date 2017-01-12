@@ -39,12 +39,20 @@ task.whichStim = 1:2; %which stimuli can have decrements: 1=fixation; 2=checkerb
 
 
 %% fixation mark
-fixpt.type = 2; %0 (default) squares, 1 circles (with anti-aliasing), 2 circles (with high-quality anti-aliasing, if supported by your hardware). If you use dot_type = 1 you'll also need to set a proper blending mode with the Screen('BlendFunction') command!
-fixpt.sizeDeg = 0.3; 
-fixpt.backColor = [0 0 200; 255 0 0; 255 0 0; 0 255 0]; %1=base; 2=miss; 3=error; 4=hit 
-fixpt.baseCrossColor  = [200 200 200];
 
-fixpt.crossThick = 3; 
+%New fixation point, January 12 2017: dot with a ring around it. The inner
+%dot is what dims, the ring gives feedback
+fixpt.dotType          = 2; % 0 (default) squares, 1 circles (with anti-aliasing), 2 circles (with high-quality anti-aliasing, if supported by your hardware). If you use dot_type = 1 you'll also need to set a proper blending mode with the Screen('BlendFunction') command!
+fixpt.diameter         = 0.2;
+fixpt.ringDiameter     = 0.35;
+fixpt.ringThick        = 2; %pixels
+
+%innner fixation  colors: 2 rows: 1=base; 2=decrement;
+fixpt.baseColor  = [255 255 255];
+fixpt.colors = [fixpt.baseColor; 200 200 200];
+%ring colors for feedback: 1=base; 2=miss, 4=false alarm; 3=hit; 
+fixpt.ringColors = [fixpt.baseColor; 255 90 90; 225 225 0; 100 255 100];
+
 
 %% parameters of carrier texture 
 carrier.nWedges     = 32;   % how many wedges in 360
