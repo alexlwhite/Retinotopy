@@ -17,17 +17,17 @@
 home; clear all;  
 
 %% parameters specific to this session: 
-subj = 'ZZ';
+subj = 'ZX';
 
 %Increment this number for each scan: 
-scanNum = 2;
+scanNum = 3;
 
 %vector of scan types to run in this session:
-scanOrder = [1 2 3 1 2 3]; 
+scanOrder = [1 2 3 1 2 3 2]; 
 scanTypes = {'Rings','Wedges','Meridians'};
 
 
-MRI            = false; %whether we're running in the magnet (determines calibration file)
+MRI            = true; %whether we're running in the magnet (determines calibration file)
 TR             = 2;     %s
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
 
@@ -52,12 +52,16 @@ cd(cFolder);
 
 %% monitor information 
 if MRI
-    load('display_scannerHSB.mat');
+    displayFile = 'display_scannerSLU_BigScreen.mat';
+    %displayFile = 'display_scannerHSB.mat';
+
 else
-    load('display_office74.mat');
-    %load('display_macbook.mat');
+    displayFile = 'display_office74.mat';
+    %displayFile = 'display_macbook.mat';
 end
 
+load(displayFile); 
+displayParams.file = displayFile;
 displayParams.TR = TR;
 displayParams.waitDummyScans = waitDummyScans;
 displayParams.open = false;
@@ -67,6 +71,12 @@ displayParams.open = false;
 
 c = retinotopyParams(displayParams); 
 
+%%%%%%% KLUGEEEEE!!!!!! 
+%if using crappy projector at BMIC, shrink carrier a bit to fit in the
+%screen
+if strcmp(displayFile,'display_scannerSLU_BigScreen.mat')
+    c.carrier.fitInScreen = true; 
+end
 c.EYE = EYE;
 c.MRI = MRI;
 
