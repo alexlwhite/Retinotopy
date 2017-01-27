@@ -3,8 +3,8 @@
 % October 2015
 %
 % Total scan duration: 256s (128 TRs)
-
-%Feb 5 2016: edited so that Wedge starts vertically (startAngle = -90)
+% 
+% Feb 5 2016: edited so that Wedge starts vertically (startAngle = -90)
 % 
 % April 18 2016: added task! detecting contrast decrements in fixation cross
 % and in checkerboard 
@@ -17,29 +17,30 @@
 home; clear all;  
 
 %% parameters specific to this session: 
-subj = 'ZX';
+subj = 'ZZ';
 
 %Increment this number for each scan: 
-scanNum = 3;
+scanNum = 1;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3 2]; 
 scanTypes = {'Rings','Wedges','Meridians'};
+nScans = length(scanOrder);
 
+%% MRI parameters
 
 MRI            = true; %whether we're running in the magnet (determines calibration file)
 TR             = 2;     %s
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
 
-nScans = length(scanOrder);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
 EYE = -1;  
 
 %% Task difficulty 
-fixtnDimProp = 0.35; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = 0.5; %contrast of checkerboard reduced by this proportion
+fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = 0.25; %contrast of checkerboard reduced by this proportion
 
 
 %% set directories
@@ -54,10 +55,9 @@ cd(cFolder);
 if MRI
     displayFile = 'display_scannerSLU_BigScreen.mat';
     %displayFile = 'display_scannerHSB.mat';
-
 else
     displayFile = 'display_office74.mat';
-    %displayFile = 'display_macbook.mat';
+    displayFile = 'display_macbook.mat';
 end
 
 load(displayFile); 
@@ -71,12 +71,6 @@ displayParams.open = false;
 
 c = retinotopyParams(displayParams); 
 
-%%%%%%% KLUGEEEEE!!!!!! 
-%if using crappy projector at BMIC, shrink carrier a bit to fit in the
-%screen
-if strcmp(displayFile,'display_scannerSLU_BigScreen.mat')
-    c.carrier.fitInScreen = true; 
-end
 c.EYE = EYE;
 c.MRI = MRI;
 

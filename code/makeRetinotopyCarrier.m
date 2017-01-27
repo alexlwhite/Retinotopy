@@ -33,11 +33,23 @@ else
     prop = min(dim)/max(dim);
 end
 
+
 if (c.carrier.fitInScreen && dim(1)>dim(2)) || (~c.carrier.fitInScreen && dim(1)<=dim(2))
     gridX = linspace(-prop,prop,dim(1));
     gridY = linspace(-1,1,dim(2));
 else
     gridX = linspace(-1,1,dim(1));
+    gridY = linspace(-prop,prop,dim(2));
+end
+
+%% KLUGE for initial setup at SLU (BMIC) 
+% necessary to make all of stimulus visible. Only the top portion of the
+% screen was visible on 1/26/17. So the solution is to shrink the stimulus
+% down (by increasing prop from 1.33) and prop up the projector. 
+if strcmp(c.display.file,'display_scannerSLU_BigScreen.mat')
+    prop = 1.5; %was 1.6 on January 26, 2017 for AW
+    
+    gridX = linspace(-prop,prop,dim(1))*1024/768;
     gridY = linspace(-prop,prop,dim(2));
 end
 
