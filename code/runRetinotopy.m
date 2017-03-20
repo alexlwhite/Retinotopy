@@ -17,30 +17,31 @@
 home; clear all;  
 
 %% parameters specific to this session: 
-subj = 'ZZ';
+subj = 'GD';
 
 %Increment this number for each scan: 
-scanNum = 1;
+scanNum = 6;
 
 %vector of scan types to run in this session:
-scanOrder = [1 2 3 1 2 3 2]; 
+scanOrder = [1 2 3 1 2 3]; 
 scanTypes = {'Rings','Wedges','Meridians'};
 nScans = length(scanOrder);
 
 %% MRI parameters
 
 MRI            = true; %whether we're running in the magnet (determines calibration file)
+
 TR             = 2;     %s
 waitDummyScans = false; %whether to wait a few volumes before starting stimulus (for scanner warm-up)
 
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = -1;  
+EYE = 1;  
 
 %% Task difficulty 
-fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = 0.25; %contrast of checkerboard reduced by this proportion
+fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = .5; %contrast of checkerboard reduced by this proportion
 
 
 %% set directories
@@ -53,10 +54,10 @@ cd(cFolder);
 
 %% monitor information 
 if MRI
-    displayFile = 'display_scannerSLU_BigScreen.mat';
-    %displayFile = 'display_scannerHSB.mat';
+    %displayFile = 'display_scannerSLU.mat';
+    displayFile = 'display_scannerHSB.mat';
 else
-    displayFile = 'display_office74.mat';
+    %displayFile = 'display_office74.mat';
     displayFile = 'display_macbook.mat';
 end
 
