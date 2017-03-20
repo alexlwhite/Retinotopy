@@ -3,7 +3,7 @@
 % by Alex White, 2016, based heavily on a script by Scott Murray (via
 % Michael-Paul Schallmo
 
-subjDate = '\AW\AWJan26ToOct27Anat';
+subjDate = '\GD\GDMar17';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 
@@ -30,15 +30,16 @@ TRs = TRsPerScan*ones(numSets,1);
 doDistCorr = ~isempty(oppPE);
 
 %% Paths
-prjPath = 'C:\Users\Alex White\Dropbox\PROJECTS\Retinotopy';
-datPath = [prjPath '\data'];
-anaPath = [prjPath '\analysis'];
+prjPath = retinotopyBase;
+datPath = fullfile(prjPath,'data');
+anaPath = fullfile(prjPath,'analysis');
 
-MRPath = [datPath subjDate '\MRI'];
-stimPath = [datPath subjDate '\stimulus'];
+MRPath = fullfile(datPath,fullfile(subjDat,'MRI'));  
+stimPath = fullfile(datPath,fullfile(subjDat,'stimulus'));  
+
 anatPath = fullfile(MRPath,'anat');
 if ~isdir(anatPath), mkdir(anatPath); end
-prtPath = [MRPath '\prts'];
+prtPath = fullfile(MRPath,'prts');
 if ~isdir(prtPath), mkdir(prtPath), end;
 resPath = fullfile(MRPath,'RESULTS');
 if ~isdir(resPath), mkdir(fullfile(MRPath,'RESULTS')); end
