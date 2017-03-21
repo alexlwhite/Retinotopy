@@ -7,7 +7,7 @@ subj = 'GD';
 subjDate = 'GDMar17';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
-subjDate = fullfile(subj,subjDate);
+subjSubjDate = fullfile(subj,subjDate);
 
 
 %% Dimensions of each functional scan
@@ -41,8 +41,8 @@ prjPath = retinotopyBase;
 datPath = fullfile(prjPath,'data');
 anaPath = fullfile(prjPath,'analysis');
 
-MRPath = fullfile(datPath,fullfile(subjDate,'MRI'));  
-stimPath = fullfile(datPath,fullfile(subjDate,'stimulus'));  
+MRPath = fullfile(datPath,fullfile(subjSubjDate,'MRI'));  
+stimPath = fullfile(datPath,fullfile(subjSubjDate,'stimulus'));  
 
 anatPath = fullfile(MRPath,'anat');
 if ~isdir(anatPath), mkdir(anatPath); end
@@ -62,6 +62,7 @@ nVWFALocScans = 0;
 nfLocScans = 0;
 
 for fi  = 1:numSets
+    clear stim task scr 
     fn = fullfile(stimPath,StimFiles{fi});
     %detect fLoc PRT files
     if strcmp(fn((end-3):end),'.prt')
@@ -73,7 +74,7 @@ for fi  = 1:numSets
         if exist('stim','var')
             switch stim.type
                 case 'Rings'
-                    if strcmp(subjDate,'\AW\AWOct27')
+                    if strcmp(subjSubjDate,'\AW\AWOct27')
                         stim.time.nConds = 15; %KLUGE! There were actually 18 conds but that doesn't fit, so set to 15
                     end
                     PRTs{fi} = sprintf('%s/%s_%i_Rings.prt',prtPath,stim.subj,stim.scanNum);
