@@ -2,7 +2,7 @@ function [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles]
 
 
 switch subjDate
-    case  '\AW\AWOct27'
+    case  'AWOct27'
         
         AnatomicalFile = 'BVIS_999_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_5_1',...
@@ -24,7 +24,7 @@ switch subjDate
             'AW_151027_05_Wedges.mat',...
             'AW_151027_06_Meridians.mat'};
         
-    case '\JM\JMNov30'
+    case 'JMNov30'
         
         AnatomicalFile = 'BVIS_002_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_002_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -47,7 +47,7 @@ switch subjDate
         
         oppPE = 'BVIS_002_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
         
-    case '\JS\JSFeb04'
+    case 'JSFeb04'
         
         AnatomicalFile = 'BVIS_003_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_003_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -70,7 +70,7 @@ switch subjDate
         
         oppPE = 'BVIS_003_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
         
-    case '\KB\KBApr25'
+    case 'KBApr25'
         
         AnatomicalFile = 'BVIS_006_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_006_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -93,7 +93,7 @@ switch subjDate
         
         oppPE = 'BVIS_006_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
         
-    case '\DP\DPMay05'
+    case 'DPMay05'
         
         AnatomicalFile = 'BVIS_007_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_007_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -116,7 +116,7 @@ switch subjDate
         
         oppPE = 'BVIS_007_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
         
-    case '\MK\MKJan09'
+    case 'MKJan09'
         
         AnatomicalFile = 'BVIS_008_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_008_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -139,7 +139,7 @@ switch subjDate
         
         oppPE = 'BVIS_008_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
         
-    case '\AW\AWJan26'
+    case 'AWJan26'
         
         AnatomicalFile = 'BVIS_999_26JAN17_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_999_26JAN17_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -164,7 +164,7 @@ switch subjDate
             'AW_170126_06_Meridians.mat',...
             'AW_170126_07_Wedges.mat'};
         
-    case '\AW\AWJan26ToOct27Anat'
+    case 'AWJan26ToOct27Anat'
         
         AnatomicalFile = 'BVIS_999_WIP_MPRAGE_nobodytune_SENSE_2_1.PAR';
         FunctionalFiles = {'BVIS_999_26JAN17_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -189,7 +189,7 @@ switch subjDate
             'AW_170126_06_Meridians.mat',...
             'AW_170126_07_Wedges.mat'};
         
-    case '\AG\AGJan27'
+    case 'AGJan27'
         
         AnatomicalFile = 'BVIS_009_WIP_MPRAGE_nobodytune_SENSE_2_1';
         FunctionalFiles = {'BVIS_009_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1',...
@@ -213,5 +213,37 @@ switch subjDate
             'AG_170127_05_Wedges.mat',...
             'AG_170127_06_Meridians.mat',...
             'AG_170127_07_Wedges.mat'};
+        
+        
+        case 'GDMar17'
+        
+        AnatomicalFile = 'BVIS_011_WIP_MPRAGE_nobodytune_SENSE_2_1';
+        FunctionalFiles = {'BVIS_011_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1';...
+                           'BVIS_011_WIP_128Dyn_3x3x3(0.5)_SENSE_5_1';...
+                           'BVIS_011_WIP_128Dyn_3x3x3(0.5)_SENSE_6_1';...
+                           'BVIS_011_WIP_128Dyn_3x3x3(0.5)_SENSE_7_1';...
+                           'BVIS_011_WIP_128Dyn_3x3x3(0.5)_SENSE_8_1';...
+                           'BVIS_011_WIP_128Dyn_3x3x3(0.5)_SENSE_9_1';...
+                           'BVIS_011_WIP_106Dyn_3x3x3(0.5)_SENSE_10_1';...
+                           'BVIS_011_WIP_106Dyn_3x3x3(0.5)_SENSE_11_1';...
+                           'BVIS_011_WIP_102Dyn_3x3x3(0.5)_SENSE_12_1'};
+        
+        oppPE = 'BVIS_011_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
+        
+        % number of TRs per scan:
+        TRsPerScan = [128 128 128 128 128 128 106 106 102];
+        slices = 30; %this one accidentally used the old exam card 
+
+        %stim files list includes PRT files for the 2 fLoc scans, and mat
+        %file for the 1 VWFA_Attn2 localizer scan 
+        StimFiles = {'GD_170317_01_Rings.mat'; ...
+                     'GD_170317_02_Wedges.mat';...
+                     'GD_170317_03_Meridians.mat';...
+                     'GD_170317_04_Rings.mat'; ...
+                     'GD_170317_05_Wedges.mat';...
+                     'GD_170317_06_Meridians.mat';...
+                     'fLoc_oddball_GD_17-Mar-2017_01_run_1.prt';...
+                     'fLoc_oddball_GD_17-Mar-2017_02_run_1.prt';...
+                     'GD_170317_Loclzr_01.mat'};
         
 end

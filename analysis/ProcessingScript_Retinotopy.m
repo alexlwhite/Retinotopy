@@ -3,9 +3,12 @@
 % by Alex White, 2016, based heavily on a script by Scott Murray (via
 % Michael-Paul Schallmo
 
-subjDate = '\GD\GDMar17';
+subj = 'GD';
+subjDate = 'GDMar17';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
+subjDate = fullfile(subj,subjDate);
+
 
 %% Dimensions of each functional scan
 xdim = 80;
@@ -25,7 +28,11 @@ if numSets ~= numel(StimFiles)
 end
 
 % number of TRs per scan (assume for now they're all the same) 
-TRs = TRsPerScan*ones(numSets,1); 
+if length(TRsPerScan)==1
+    TRs = TRsPerScan*ones(numSets,1); 
+else
+    TRs = TRsPerScan;
+end
 
 doDistCorr = ~isempty(oppPE);
 
@@ -34,8 +41,8 @@ prjPath = retinotopyBase;
 datPath = fullfile(prjPath,'data');
 anaPath = fullfile(prjPath,'analysis');
 
-MRPath = fullfile(datPath,fullfile(subjDat,'MRI'));  
-stimPath = fullfile(datPath,fullfile(subjDat,'stimulus'));  
+MRPath = fullfile(datPath,fullfile(subjDate,'MRI'));  
+stimPath = fullfile(datPath,fullfile(subjDate,'stimulus'));  
 
 anatPath = fullfile(MRPath,'anat');
 if ~isdir(anatPath), mkdir(anatPath); end
@@ -46,36 +53,63 @@ if ~isdir(resPath), mkdir(fullfile(MRPath,'RESULTS')); end
 
 cd(datPath);
 addpath(genpath(anaPath)); 
- 
-    %% Make PRTs from stimulus files
- PRTs = cell(1,numSets);
- for fi  = 1:numSets
-     fn = fullfile(stimPath,StimFiles{fi});
-     load(fn);
-     if exist('stim','var')
-         switch stim.type
-             case 'Rings'
-                 if strcmp(subjDate,'\AW\AWOct27')
-                     stim.time.nConds = 15; %KLUGE! There were actually 18 conds but that doesn't fit, so set to 15
-                 end
-                 PRTs{fi} = sprintf('%s/%s_%i_Rings.prt',prtPath,stim.subj,stim.scanNum);
-                 makeRingsPRT(stim,PRTs{fi});
-                 
-             case 'Wedges'
-                 PRTs{fi} = sprintf('%s/%s_%i_Wedges.prt',prtPath,stim.subj,stim.scanNum);
-                 makeWedgePRT(stim,PRTs{fi});
-                 
-             case 'Meridians'
-                 PRTs{fi} = sprintf('%s/%s_%i_Merids.prt',prtPath,stim.subj,stim.scanNum);
-                 makeMeridPRT(stim,PRTs{fi});
-         end
-     end
- end
+
+%% Make PRTs from stimulus files
+PRTs          = cell(1,numSets);
+nVWFALoc     = zeros(1,numSets); 
+nfLoc        = zeros(1,numSets);
+nVWFALocScans = 0;
+nfLocScans = 0;
+
+for fi  = 1:numSets
+    fn = fullfile(stimPath,StimFiles{fi});
+    %detect fLoc PRT files
+    if strcmp(fn((end-3):end),'.prt')
+        PRTs{fi} = fn;
+        nfLocScans = nfLocScans + 1;
+        nfLoc(fi) = nfLocScans;
+    else
+        load(fn);
+        if exist('stim','var')
+            switch stim.type
+                case 'Rings'
+                    if strcmp(subjDate,'\AW\AWOct27')
+                        stim.time.nConds = 15; %KLUGE! There were actually 18 conds but that doesn't fit, so set to 15
+                    end
+                    PRTs{fi} = sprintf('%s/%s_%i_Rings.prt',prtPath,stim.subj,stim.scanNum);
+                    makeRingsPRT(stim,PRTs{fi});
+
+                case 'Wedges'
+                    PRTs{fi} = sprintf('%s/%s_%i_Wedges.prt',prtPath,stim.subj,stim.scanNum);
+                    makeWedgePRT(stim,PRTs{fi});
+
+                case 'Meridians'
+                    PRTs{fi} = sprintf('%s/%s_%i_Merids.prt',prtPath,stim.subj,stim.scanNum);
+                    makeMeridPRT(stim,PRTs{fi});
+            end
+
+        elseif exist('task','var')
+            if task.localizer && strcmp(task.codeFilename,'VWFA_Attn2_RunLocalizer.m')
+                nVWFALocScans = nVWFALocScans+1;
+                prtN = sprintf('%s_Loc%i.prt',subjDate,nVWFALocScans);
+                PRTs{fi} = fullfile(prtPath,prtN);
+                makePRT_VWFA_Attn2_Locr(task, PRTs{fi});
+                nVWFALoc(fi) = nVWFALocScans;
+            end
+        end
+    end
+end
 %% Make directories and move files
 %check if moved happened already
 fmrFolders = cell(1,numSets);
 for i = 1:numSets
-    fmrFolders{i} = fullfile(MRPath,sprintf('s%i',i));
+    if nVWFALoc(i)>0
+        fmrFolders{i} = fullfile(MRPath,sprintf('s%i_VWFALoc%i',i,nVWFALoc(i)));
+    elseif nfLoc(i)>0
+        fmrFolders{i} = fullfile(MRPath,sprintf('s%i_fLoc%i',i,nfLoc(i)));
+    else
+        fmrFolders{i} = fullfile(MRPath,sprintf('s%i',i));
+    end
 end
 moved = isdir(fmrFolders{numSets});
 if moved
@@ -116,8 +150,16 @@ swapBytes = false;
 bytesPerPix = 2;
 fmrNames = cell(1,numSets);
 for i = 1:numSets
-    stcPrefix = sprintf('s%i',i);
-    fmrNames{i} = sprintf('s%i.fmr',i);
+    if nfLoc(i)>0
+        stcPrefix = sprintf('s%i_fLoc%i',i,nfLoc(i));
+        fmrNames{i} = sprintf('s%i_fLoc%i.fmr',i,nfLoc(i));
+    elseif nVWFALoc(i)>0
+        stcPrefix = sprintf('s%i_VWFALoc%i',i,nVWFALoc(i));
+        fmrNames{i} = sprintf('s%i_VWFALoc%i.fmr',i,nVWFALoc(i));
+    else
+        stcPrefix = sprintf('s%i',i);
+        fmrNames{i} = sprintf('s%i.fmr',i);
+    end
     rawFile = fullfile(fmrFolders{i}, [FunctionalFiles{i} '.REC']);
     if ~exist(fullfile(fmrFolders{i},fmrNames{i}),'file')
         fmr = bvqx.CreateProjectFMR('PHILIPS_REC',rawFile, TRs(i), nVolsToSkip, createAMR, slices, stcPrefix, swapBytes, xdim, ydim, bytesPerPix, fmrFolders{i});
@@ -260,6 +302,7 @@ pause
 %% Make VTC's 
 
 vtcSpace = 'ACPC'; %'TAL'; 
+useBoundingBox = true;
 
 VMR = fullfile(anatPath,'anat_SAG_IIHC.vmr'); %Important to load the native VMR not the ACPC or TAL
 
@@ -275,6 +318,17 @@ end
 IA = fullfile(fmrFolders{1},IA);
 FA = fullfile(fmrFolders{1},FA);
 
+if strcmp(vtcSpace,'TAL')
+    vtcType = 'TAL';
+else
+    if useBoundingBox
+        vtcType = 'ACPC_bbox';
+    else
+        vtcType = 'ACPC';
+    end
+end
+
+
 TAL = 'anat_SAG_IIHC_aACPC.tal';
 ACPC = 'anat_SAG_IIHC_aACPC.trf';
 
@@ -283,14 +337,23 @@ vtcResolution = 3; %WHY?
 vtcInterp = 1; %0=nearest neighbor; 1=tilinear; 2=sinc
 boundBoxThreshold = 100; 
 
-useBoundingBox = true;
+
 
 for i = 1:numSets
     docVMR = bvqx.OpenDocument(VMR);
     docVMR.ExtendedTALSpaceForVTCCreation = 0;
+    
+    if nfLoc(i)>0
+        vtcName = sprintf('s%i_fLoc%i_%s.vtc',i,nfLoc(i),vtcType);
+    elseif nVWFALoc(i)>0
+        vtcName = sprintf('s%i_VWFALoc%i_%s.vtc',i,nVWFALoc(i),vtcType);
+    else
+        vtcName = sprintf('s%i_%s.vtc',i,vtcType);
+    end
+        
+        
     if strcmp(vtcSpace,'ACPC')
         if useBoundingBox
-            vtcName = sprintf('s%i_ACPC_bbox.vtc',i);
             docVMR.UseBoundingBoxForVTCCreation = 1;
             %Set the box as big as possible
             docVMR.TargetVTCBoundingBoxXStart = 1;
@@ -300,13 +363,11 @@ for i = 1:numSets
             docVMR.TargetVTCBoundingBoxZStart = 1;
             docVMR.TargetVTCBoundingBoxZEnd = 255;
         else
-            vtcName = sprintf('s%i_ACPC.vtc',i);
             docVMR.UseBoundingBoxForVTCCreation = 0;
         end
         docVMR.CreateVTCInACPCSpace(processedFMRs{i},IA,FA,ACPC,vtcName,vtcDataType,vtcResolution,vtcInterp,boundBoxThreshold);
     else
         docVMR.UseBoundingBoxForVTCCreation = 0;
-        vtcName = sprintf('s%i_TAL.vtc',i);
         docVMR.CreateVTCInTALSpace(processedFMRs{i},IA,FA,ACPC,TAL,vtcName,vtcDataType,vtcResolution,vtcInterp,boundBoxThreshold);
     end
     docVMR.Close;
