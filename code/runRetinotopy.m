@@ -34,7 +34,7 @@
 
 
 %% parameters specific to this session: 
-subj = 'XX';
+subj = 'DS';
 
 %Increment this number for each scan: 
 scanNum = 1;
