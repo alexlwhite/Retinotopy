@@ -3,8 +3,8 @@
 % by Alex White, 2016, based heavily on a script by Scott Murray (via
 % Michael-Paul Schallmo
 
-subj = 'GD';
-subjDate = 'GDMar17';
+subj = 'DS';
+subjDate = 'DSMar22';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 subjSubjDate = fullfile(subj,subjDate);
@@ -67,6 +67,9 @@ for fi  = 1:numSets
     %detect fLoc PRT files
     if strcmp(fn((end-3):end),'.prt')
         PRTs{fi} = fn;
+        %move this PRT to PRT folder 
+        movefile(fn, fullfile(prtPath, StimFiles{fi}));
+
         nfLocScans = nfLocScans + 1;
         nfLoc(fi) = nfLocScans;
     else

@@ -34,10 +34,10 @@
 
 
 %% parameters specific to this session: 
-subj = 'DS';
+subj = 'PO';
 
 %Increment this number for each scan: 
-scanNum = 1;
+scanNum = 3;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -46,7 +46,7 @@ nScans = length(scanOrder);
 
 %% MRI parameters
 
-MRI = false; %whether we're running in the magnet (determines calibration file)
+MRI = true; %whether we're running in the magnet (determines calibration file)
 
 TR  = 2;     %s
 
@@ -54,9 +54,9 @@ waitDummyScans = false; %whether to wait a few volumes before starting stimulus 
 
 %% monitor information 
 if MRI
-    displayName = 'scannerHSB';
+    displayName = 'scannerSLU';
 else
-    displayName = 'default';
+    displayName = 'macbook';
 end
 
 displayFile = sprintf('display_%s.mat',displayName);
@@ -67,7 +67,7 @@ EYE = -1;
 
 %% Task difficulty 
 fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = .5; %contrast of checkerboard reduced by this proportion
+checkerContrastDimProp = .55; %contrast of checkerboard reduced by this proportion
 
 
 %% set directories and path
