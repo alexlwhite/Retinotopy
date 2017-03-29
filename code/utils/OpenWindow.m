@@ -110,7 +110,8 @@ if ~isfield(display,'resolution')
 end
 
 [display.xres, display.yres]    = Screen('WindowSize',display.windowPtr);       % heigth and width of screen [pix]
-display.ppd = display.dist*tan(1*pi/180)/(display.width/(10*display.xres));	% distance between fixation point and target in pixels
+display.ppd = display.dist*tan(1*pi/180)/(display.width/display.xres);	 %pixels per degree 
+
 % determine the main window's center
 [display.centerX, display.centerY] = WindowCenter(display.windowPtr);
 
