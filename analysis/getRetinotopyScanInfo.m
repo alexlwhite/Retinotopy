@@ -303,4 +303,21 @@ switch subjDate
                      'fLoc_oddball_DS_22-Mar-2017_02_run_1.prt';...
                      'DS_170322_Loclzr_01.mat';...
                      'DS_170322_Loclzr_02.mat'};
+                 
+      case 'POMar24'
+        
+        AnatomicalFile = 'BVIS_013_WIP_MPRAGE_nobodytune_SENSE_2_1';
+        FunctionalFiles = {'BVIS_013_WIP_128Dyn_3x3x3(0.5)_SENSE_4_1';...
+                           'BVIS_013_WIP_128Dyn_3x3x3(0.5)_SENSE_5_1'};
+        
+        oppPE = 'BVIS_013_WIP_1Dyn_FSDIR_A3x3x3(0.5)_SENSE_3_1';  %opposite-phase encoded scan
+        
+        % number of TRs per scan:
+        TRsPerScan = [128 128];
+        slices = 35; %newer exam card 
+
+        %stim files list includes PRT files for the 2 fLoc scans, and mat
+        %file for the 1 VWFA_Attn2 localizer scan 
+        StimFiles = {'PO_170324_01_Rings.mat'; ...
+                     'PO_170324_02_Wedges.mat'};
 end
