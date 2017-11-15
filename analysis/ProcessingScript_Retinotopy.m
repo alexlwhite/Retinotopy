@@ -3,8 +3,8 @@
 % by Alex White, 2016, based heavily on a script by Scott Murray (via
 % Michael-Paul Schallmo
 
-subj = 'DS';
-subjDate = 'DSMar22';
+subj = 'PO';
+subjDate = 'POMar24';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 subjSubjDate = fullfile(subj,subjDate);
