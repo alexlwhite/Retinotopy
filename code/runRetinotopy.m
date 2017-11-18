@@ -34,10 +34,10 @@
 
 
 %% parameters specific to this session: 
-subj = 'XX';
+subj = 'WD';
 
 %Increment this number for each scan: 
-scanNum = 1;
+scanNum = 6;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -54,7 +54,7 @@ waitDummyScans = false; %whether to wait a few volumes before starting stimulus 
 
 %% monitor information 
 if MRI
-    displayName = 'scannerSLU';
+    displayName = 'scannerHSB';
 else
     displayName = 'macbook';
 end
@@ -63,11 +63,11 @@ displayFile = sprintf('display_%s.mat',displayName);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = -1;  
+EYE = 1;  
 
 %% Task difficulty 
-fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = .55; %contrast of checkerboard reduced by this proportion
+fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = .35; %contrast of checkerboard reduced by this proportion
 
 
 %% set directories and path
