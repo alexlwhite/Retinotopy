@@ -3,8 +3,8 @@
 % by Alex White, 2016, based heavily on a script by Scott Murray (via
 % Michael-Paul Schallmo
 
-subj = 'WD';
-subjDate = 'WDNov17';
+subj = 'DS';
+subjDate = 'DSMar22';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 subjSubjDate = fullfile(subj,subjDate);
@@ -47,7 +47,7 @@ stimPath = fullfile(datPath,fullfile(subjSubjDate,'stimulus'));
 anatPath = fullfile(MRPath,'anat');
 if ~isdir(anatPath), mkdir(anatPath); end
 prtPath = fullfile(MRPath,'prts');
-if ~isdir(prtPath), mkdir(prtPath), end
+if ~isdir(prtPath), mkdir(prtPath), end;
 resPath = fullfile(MRPath,'RESULTS');
 if ~isdir(resPath), mkdir(fullfile(MRPath,'RESULTS')); end
 
@@ -145,8 +145,7 @@ if doDistCorr
 end
 
 %% Start BrainVoyager
-bvqx = actxserver('BrainVoyagerQX.BrainVoyagerQXScriptAccess.1');
-
+bv = actxserver('BrainVoyager.BrainVoyagerScriptAccess.1');
 %% Make fmr files
 nVolsToSkip = 0;    
 createAMR = false;
@@ -166,7 +165,7 @@ for i = 1:numSets
     end
     rawFile = fullfile(fmrFolders{i}, [FunctionalFiles{i} '.REC']);
     if ~exist(fullfile(fmrFolders{i},fmrNames{i}),'file')
-        fmr = bvqx.CreateProjectFMR('PHILIPS_REC',rawFile, TRs(i), nVolsToSkip, createAMR, slices, stcPrefix, swapBytes, xdim, ydim, bytesPerPix, fmrFolders{i});
+        fmr = bv.CreateProjectFMR('PHILIPS_REC',rawFile, TRs(i), nVolsToSkip, createAMR, slices, stcPrefix, swapBytes, xdim, ydim, bytesPerPix, fmrFolders{i});
         fmr.LinkStimulationProtocol(PRTs{i});
         fmr.SaveAs(fmrNames{i});
         fmr.Close;
@@ -178,7 +177,7 @@ scanOrder = 1; %0=ascending, 1=ascending-interleaved, 2=Siemens ascending-interl
 timeInterp = 0; %0=trilinear, 1=cubic spline, 2= SINC. 
 sliceTimeFMRs = cell(1,numSets);
 for i = 1:numSets
-    docFMR = bvqx.OpenDocument(fullfile(fmrFolders{i},fmrNames{i}));
+    docFMR = bv.OpenDocument(fullfile(fmrFolders{i},fmrNames{i}));
     docFMR.CorrectSliceTiming(scanOrder,timeInterp);
     sliceTimeFMRs{i} = docFMR.FileNameOfPreprocessdFMR;
     docFMR.Close;
@@ -200,7 +199,7 @@ for i = 1:numSets
     motnFMRs{i} = [thisFile(1:(end-4)) '_3DMCTS.fmr'];
     if ~exist(motnFMRs{i},'file') %only do motion correction if it's not done already! 
         fprintf(1,'\nstarting motion correction for scan %i\n',i);
-        docFMR = bvqx.OpenDocument(thisFile); %(fullfile(fmrFolders{i},fmrNames{i})); 
+        docFMR = bv.OpenDocument(thisFile); %(fullfile(fmrFolders{i},fmrNames{i})); 
         docFMR.CorrectMotionTargetVolumeInOtherRunEx(targetFMR,targetVol,interpMethod,useFullDataSet,maxIterations,makeMovies,makeLogFile);
         if ~strcmp(docFMR.FileNameOfPreprocessdFMR,motnFMRs{i})
             fprintf(1,'Resulting filename of motion-corrected fmr, \n\t %s,\n does not match expected:\n\t%s\n\n',docFMR.FileNameOfPreprocessdFMR,motnFMRs{i});
@@ -214,7 +213,7 @@ if doDistCorr
     oppFile = fullfile(oppPath,[oppPE '.REC']);
     nTRs = 1;
     stcPrefix = 'oppPE';
-    fmr = bvqx.CreateProjectFMR('PHILIPS_REC',oppFile, nTRs, nVolsToSkip, createAMR, slices, stcPrefix, swapBytes, xdim, ydim, bytesPerPix, oppPath);
+    fmr = bv.CreateProjectFMR('PHILIPS_REC',oppFile, nTRs, nVolsToSkip, createAMR, slices, stcPrefix, swapBytes, xdim, ydim, bytesPerPix, oppPath);
     fmr.SaveAs(['oppPE.fmr']);
     fmr.Close;
     
@@ -249,7 +248,7 @@ for i = 1:numSets
     else
         fmrName = motnFMRs{i};
     end
-    docFMR = bvqx.OpenDocument(fmrName);
+    docFMR = bv.OpenDocument(fmrName);
     docFMR.TemporalHighPassFilterGLMFourier(highPassCycles);
     processedFMRs{i} = docFMR.FileNameOfPreprocessdFMR;
     docFMR.Close;
@@ -287,14 +286,14 @@ anatFile = fullfile(anatPath,[AnatomicalFile '.REC']);
 anatNBytes = 2;
 isLittleEndian = false;
 
-docVMR = bvqx.CreateProjectVMR('PHILIPS_REC',anatFile,anatSlices,isLittleEndian,anatXDim,anatYDim,anatNBytes);
+docVMR = bv.CreateProjectVMR('PHILIPS_REC',anatFile,anatSlices,isLittleEndian,anatXDim,anatYDim,anatNBytes);
 
 docVMR.SaveAs(fullfile(anatPath,'anat.vmr')); %[path '3danat\3d_anat']);
 docVMR.CorrectIntensityInhomogeneities();
 docVMR.AutoTransformToSAG('anat_SAG_IIHC.vmr');
 docVMR.Close;
 delete(fullfile(anatPath,'anat_IIHC*'));
-docVMR = bvqx.OpenDocument(fullfile(anatPath, 'anat_SAG_IIHC.vmr'));
+docVMR = bv.OpenDocument(fullfile(anatPath, 'anat_SAG_IIHC.vmr'));
 disp('Examine brightness values. Any key to continue.')
 pause
 
@@ -344,7 +343,7 @@ boundBoxThreshold = 100;
 
 
 for i = 1:numSets
-    docVMR = bvqx.OpenDocument(VMR);
+    docVMR = bv.OpenDocument(VMR);
     docVMR.ExtendedTALSpaceForVTCCreation = 0;
     
     if nfLoc(i)>0
