@@ -2,9 +2,11 @@
 % Specialized for Retinotopy data
 % by Alex White, 2016, based heavily on a script by Scott Murray (via
 % Michael-Paul Schallmo
+%This version is for BrainVoyager version 20, which has slightly different
+%commands to run via Matlab. 
 
-subj = 'DS';
-subjDate = 'DSMar22';
+subj = 'WD';
+subjDate = 'WDNov17';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 subjSubjDate = fullfile(subj,subjDate);
@@ -68,8 +70,10 @@ for fi  = 1:numSets
     if strcmp(fn((end-3):end),'.prt')
         PRTs{fi} = fn;
         %move this PRT to PRT folder 
-        movefile(fn, fullfile(prtPath, StimFiles{fi}));
-
+        if ~exist( fullfile(prtPath, StimFiles{fi}),'file')
+            movefile(fn, fullfile(prtPath, StimFiles{fi}));
+        end
+        
         nfLocScans = nfLocScans + 1;
         nfLoc(fi) = nfLocScans;
     else

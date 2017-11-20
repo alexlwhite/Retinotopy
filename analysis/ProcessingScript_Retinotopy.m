@@ -9,7 +9,7 @@ subjDate = 'WDNov17';
  
 subjSubjDate = fullfile(subj,subjDate);
 
-x=2;
+
 %% Dimensions of each functional scan
 xdim = 80;
 ydim = 80;
