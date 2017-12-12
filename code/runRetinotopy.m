@@ -34,7 +34,7 @@
 
 
 %% parameters specific to this session: 
-subj = 'WD';
+subj = 'PD';
 
 %Increment this number for each scan: 
 scanNum = 6;
@@ -66,8 +66,8 @@ displayFile = sprintf('display_%s.mat',displayName);
 EYE = 1;  
 
 %% Task difficulty 
-fixtnDimProp = 0.25; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = .35; %contrast of checkerboard reduced by this proportion
+fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = .42; %contrast of checkerboard reduced by this proportion
 
 
 %% set directories and path

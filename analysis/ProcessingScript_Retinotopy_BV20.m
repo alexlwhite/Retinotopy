@@ -5,8 +5,8 @@
 %This version is for BrainVoyager version 20, which has slightly different
 %commands to run via Matlab. 
 
-subj = 'WD';
-subjDate = 'WDNov17';
+subj = 'VF';
+subjDate = 'VFNov28';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 subjSubjDate = fullfile(subj,subjDate);
