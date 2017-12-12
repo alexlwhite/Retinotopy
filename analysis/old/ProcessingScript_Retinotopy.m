@@ -1,37 +1,16 @@
-%% Information to be updated for this scan
-subjDate = '\AW\AWOct27';
+%% BrainVoyager pre-processing script
+% Specialized for Retinotopy data
+% by Alex White, 2016, based heavily on a script by Scott Murray (via
+% Michael-Paul Schallmo
 
-AnatomicalFile = 'BVIS_999_WIP_MPRAGE_nobodytune_SENSE_2_1';
-FunctionalFiles = {'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_5_1',...
-                          'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_6_1',...
-                          'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_7_1',...
-                          'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_8_1',...
-                          'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_9_1',...
-                          'BVIS_999_WIP_120Dyn_3x3x3(0.5)_SENSE_10_1'};
-
-numSets = numel(FunctionalFiles); % size(FunctionalFiles,1);
+subj = 'WD';
+subjDate = 'WDNov17';
+[AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
-% number of TRs per scan: 
-TRs =120*ones(numSets,1); 
-
-StimFiles = {'AW_151027_01_Rings.mat', ...
-             'AW_151027_02_Wedges.mat',...
-             'AW_151027_03_Meridians.mat',...
-             'AW_151027_04_Rings.mat', ...
-             'AW_151027_05_Wedges.mat',...
-             'AW_151027_06_Meridians.mat'};
-
- if numSets ~= numel(StimFiles)
-     fprintf(1,'\n\nWARNING: not the same number of stim files as MR sets\n');
-     keyboard
- end
- 
-oppPE = '';  
-doDistCorr = ~isempty(oppPE);
+subjSubjDate = fullfile(subj,subjDate);
 
 
 %% Dimensions of each functional scan
-slices = 30;
 xdim = 80;
 ydim = 80;
 
@@ -40,52 +19,101 @@ anatSlices = 176;
 anatXDim = 256;
 anatYDim = 256;
 
-%% Paths
-prjPath = 'C:\Users\Alex White\Dropbox\PROJECTS\Retinotopy';
-datPath = [prjPath '\data'];
-anaPath = [prjPath '\analysis'];
+%% fill in some info
+numSets = numel(FunctionalFiles); % size(FunctionalFiles,1);
+ 
+if numSets ~= numel(StimFiles)
+     fprintf(1,'\n\nWARNING: not the same number of stim files as MR sets\n');
+     keyboard
+end
 
-MRPath = [datPath subjDate '\MRI'];
-stimPath = [datPath subjDate '\stimulus'];
+% number of TRs per scan (assume for now they're all the same) 
+if length(TRsPerScan)==1
+    TRs = TRsPerScan*ones(numSets,1); 
+else
+    TRs = TRsPerScan;
+end
+
+doDistCorr = ~isempty(oppPE);
+
+%% Paths
+prjPath = retinotopyBase;
+datPath = fullfile(prjPath,'data');
+anaPath = fullfile(prjPath,'analysis');
+
+MRPath = fullfile(datPath,fullfile(subjSubjDate,'MRI'));  
+stimPath = fullfile(datPath,fullfile(subjSubjDate,'stimulus'));  
+
 anatPath = fullfile(MRPath,'anat');
 if ~isdir(anatPath), mkdir(anatPath); end
-prtPath = [MRPath '\prts'];
-if ~isdir(prtPath), mkdir(prtPath), end;
+prtPath = fullfile(MRPath,'prts');
+if ~isdir(prtPath), mkdir(prtPath), end
 resPath = fullfile(MRPath,'RESULTS');
 if ~isdir(resPath), mkdir(fullfile(MRPath,'RESULTS')); end
 
 cd(datPath);
 addpath(genpath(anaPath)); 
- 
- %% Make PRTs from stimulus files
- PRTs = cell(1,numSets);
- for fi  = 1:numSets
-     fn = fullfile(stimPath,StimFiles{fi});
-     load(fn);
-     if exist('stim','var')
-         switch stim.type
-             case 'Rings'
-                 if strcmp(subjDate,'\AW\AWOct27')
-                     stim.time.nConds = 15; %KLUGE! There were actually 18 conds but that doesn't fit, so set to 15
-                 end
-                 PRTs{fi} = sprintf('%s/%s_%i_Rings.prt',prtPath,stim.subj,stim.scanNum);
-                 makeRingsPRT(stim,PRTs{fi});
-                 
-             case 'Wedges'
-                 PRTs{fi} = sprintf('%s/%s_%i_Wedges.prt',prtPath,stim.subj,stim.scanNum);
-                 makeWedgePRT(stim,PRTs{fi});
-                 
-             case 'Meridians'
-                 PRTs{fi} = sprintf('%s/%s_%i_Merids.prt',prtPath,stim.subj,stim.scanNum);
-                 makeMeridPRT(stim,PRTs{fi});
-         end
-     end
- end
+
+%% Make PRTs from stimulus files
+PRTs          = cell(1,numSets);
+nVWFALoc     = zeros(1,numSets); 
+nfLoc        = zeros(1,numSets);
+nVWFALocScans = 0;
+nfLocScans = 0;
+
+for fi  = 1:numSets
+    clear stim task scr 
+    fn = fullfile(stimPath,StimFiles{fi});
+    %detect fLoc PRT files
+    if strcmp(fn((end-3):end),'.prt')
+        PRTs{fi} = fn;
+        %move this PRT to PRT folder 
+        movefile(fn, fullfile(prtPath, StimFiles{fi}));
+
+        nfLocScans = nfLocScans + 1;
+        nfLoc(fi) = nfLocScans;
+    else
+        load(fn);
+        if exist('stim','var')
+            switch stim.type
+                case 'Rings'
+                    if strcmp(subjSubjDate,'\AW\AWOct27')
+                        stim.time.nConds = 15; %KLUGE! There were actually 18 conds but that doesn't fit, so set to 15
+                    end
+                    PRTs{fi} = sprintf('%s/%s_%i_Rings.prt',prtPath,stim.subj,stim.scanNum);
+                    makeRingsPRT(stim,PRTs{fi});
+
+                case 'Wedges'
+                    PRTs{fi} = sprintf('%s/%s_%i_Wedges.prt',prtPath,stim.subj,stim.scanNum);
+                    makeWedgePRT(stim,PRTs{fi});
+
+                case 'Meridians'
+                    PRTs{fi} = sprintf('%s/%s_%i_Merids.prt',prtPath,stim.subj,stim.scanNum);
+                    makeMeridPRT(stim,PRTs{fi});
+            end
+
+        elseif exist('task','var')
+            if task.localizer && strcmp(task.codeFilename,'VWFA_Attn2_RunLocalizer.m')
+                nVWFALocScans = nVWFALocScans+1;
+                prtN = sprintf('%s_Loc%i.prt',subjDate,nVWFALocScans);
+                PRTs{fi} = fullfile(prtPath,prtN);
+                makePRT_VWFA_Attn2_Locr(task, PRTs{fi});
+                nVWFALoc(fi) = nVWFALocScans;
+            end
+        end
+    end
+end
 %% Make directories and move files
 %check if moved happened already
 fmrFolders = cell(1,numSets);
 for i = 1:numSets
-    fmrFolders{i} = fullfile(MRPath,sprintf('s%i',i));
+    if nVWFALoc(i)>0
+        fmrFolders{i} = fullfile(MRPath,sprintf('s%i_VWFALoc%i',i,nVWFALoc(i)));
+    elseif nfLoc(i)>0
+        fmrFolders{i} = fullfile(MRPath,sprintf('s%i_fLoc%i',i,nfLoc(i)));
+    else
+        fmrFolders{i} = fullfile(MRPath,sprintf('s%i',i));
+    end
 end
 moved = isdir(fmrFolders{numSets});
 if moved
@@ -99,7 +127,6 @@ if ~moved
         movefile(fullfile(MRPath,[FunctionalFiles{i} '.REC']), fullfile(fmrFolders{i}, [FunctionalFiles{i} '.REC']));
     end
 end
-
 
 moved = ~exist(fullfile(MRPath, [AnatomicalFile '.PAR']),'file');
 if ~moved
@@ -117,8 +144,6 @@ if doDistCorr
     end
 end
 
-
-
 %% Start BrainVoyager
 bvqx = actxserver('BrainVoyagerQX.BrainVoyagerQXScriptAccess.1');
 
@@ -129,8 +154,16 @@ swapBytes = false;
 bytesPerPix = 2;
 fmrNames = cell(1,numSets);
 for i = 1:numSets
-    stcPrefix = sprintf('s%i',i);
-    fmrNames{i} = sprintf('s%i.fmr',i);
+    if nfLoc(i)>0
+        stcPrefix = sprintf('s%i_fLoc%i',i,nfLoc(i));
+        fmrNames{i} = sprintf('s%i_fLoc%i.fmr',i,nfLoc(i));
+    elseif nVWFALoc(i)>0
+        stcPrefix = sprintf('s%i_VWFALoc%i',i,nVWFALoc(i));
+        fmrNames{i} = sprintf('s%i_VWFALoc%i.fmr',i,nVWFALoc(i));
+    else
+        stcPrefix = sprintf('s%i',i);
+        fmrNames{i} = sprintf('s%i.fmr',i);
+    end
     rawFile = fullfile(fmrFolders{i}, [FunctionalFiles{i} '.REC']);
     if ~exist(fullfile(fmrFolders{i},fmrNames{i}),'file')
         fmr = bvqx.CreateProjectFMR('PHILIPS_REC',rawFile, TRs(i), nVolsToSkip, createAMR, slices, stcPrefix, swapBytes, xdim, ydim, bytesPerPix, fmrFolders{i});
@@ -190,7 +223,7 @@ if doDistCorr
     % 	- Plugins Menu --> COPE (v0.5) --> Go to the Estimate VDM Tab (opens by default)
     % 	- Phase-encoding directions = A>>P and P>>A
     % 	- Estimate from : set1_3DMCTS.fmr (pick this for the first row,
-    % 	because it's A>>P), Volume = 1, and the oppPE.fmr
+    % 	because it's A>>P), Volume = 1, and then oppPE.fmr in the 2nd row
     % 	- Type of data = GE
     % 	- Click run at the bottom
     % 	- Go to the Apply VDM tab
@@ -216,13 +249,16 @@ for i = 1:numSets
     else
         fmrName = motnFMRs{i};
     end
-
     docFMR = bvqx.OpenDocument(fmrName);
     docFMR.TemporalHighPassFilterGLMFourier(highPassCycles);
     processedFMRs{i} = docFMR.FileNameOfPreprocessdFMR;
     docFMR.Close;
 end
 
+%% in case preprocessing is already done and just need to get the filenames: 
+% for i=1:numSets
+%     processedFMRs{i} = fullfile(fmrFolders{i},sprintf('s%i_SCLAI_3DMCTS_undist_LTR_THPGLMF2c.fmr',i));
+% end
 %% Delete unnecessary files
 for i = 1:numSets
     %delete original .fmr and .stc files
@@ -232,7 +268,7 @@ for i = 1:numSets
 
     %delete slice time corrected .fmr and .stc files
     delete(sliceTimeFMRs{i});
-    delete([sliceTimeFMRs{i}(1:(end-4)) '.sct']);
+    delete([sliceTimeFMRs{i}(1:(end-4)) '.stc']);
     %delete motion corrected .fmr and .stc files
     delete(motnFMRs{i});
     delete([motnFMRs{i}(1:(end-4)) '.stc']);
@@ -258,21 +294,21 @@ docVMR.CorrectIntensityInhomogeneities();
 docVMR.AutoTransformToSAG('anat_SAG_IIHC.vmr');
 docVMR.Close;
 delete(fullfile(anatPath,'anat_IIHC*'));
-%eval (['!del ' anatPath '\anat_IIHC*'])
 docVMR = bvqx.OpenDocument(fullfile(anatPath, 'anat_SAG_IIHC.vmr'));
 disp('Examine brightness values. Any key to continue.')
 pause
 
 docVMR.AutoACPCAndTALTransformation();
-disp('Coregister functionals and anatomicals. Put .trfs in anat directory.')
+disp('Coregister functional set 1 and anatomical (native space).')
 disp('Any key to continue.')
 pause
 
 %% Make VTC's 
 
-vtcSpace = 'TAL'; %'ACPC';
+vtcSpace = 'ACPC'; %'TAL'; 
+useBoundingBox = true;
 
-VMR = fullfile(anatPath,'anat_SAG_IIHC.vmr'); %WHY NOT TAL OR ACPC?
+VMR = fullfile(anatPath,'anat_SAG_IIHC.vmr'); %Important to load the native VMR not the ACPC or TAL
 
 if doDistCorr
     IA = 's1_SCLAI_3DMCTS_undist_LTR_THPGLMF2c-TO-anat_SAG_IIHC_IA.trf';
@@ -286,6 +322,17 @@ end
 IA = fullfile(fmrFolders{1},IA);
 FA = fullfile(fmrFolders{1},FA);
 
+if strcmp(vtcSpace,'TAL')
+    vtcType = 'TAL';
+else
+    if useBoundingBox
+        vtcType = 'ACPC_bbox';
+    else
+        vtcType = 'ACPC';
+    end
+end
+
+
 TAL = 'anat_SAG_IIHC_aACPC.tal';
 ACPC = 'anat_SAG_IIHC_aACPC.trf';
 
@@ -294,23 +341,37 @@ vtcResolution = 3; %WHY?
 vtcInterp = 1; %0=nearest neighbor; 1=tilinear; 2=sinc
 boundBoxThreshold = 100; 
 
-useBoundingBox = true;
+
 
 for i = 1:numSets
     docVMR = bvqx.OpenDocument(VMR);
     docVMR.ExtendedTALSpaceForVTCCreation = 0;
+    
+    if nfLoc(i)>0
+        vtcName = sprintf('s%i_fLoc%i_%s.vtc',i,nfLoc(i),vtcType);
+    elseif nVWFALoc(i)>0
+        vtcName = sprintf('s%i_VWFALoc%i_%s.vtc',i,nVWFALoc(i),vtcType);
+    else
+        vtcName = sprintf('s%i_%s.vtc',i,vtcType);
+    end
+        
+        
     if strcmp(vtcSpace,'ACPC')
         if useBoundingBox
-            vtcName = sprintf('s%i_bbox.vtc',i);
             docVMR.UseBoundingBoxForVTCCreation = 1;
+            %Set the box as big as possible
+            docVMR.TargetVTCBoundingBoxXStart = 1;
+            docVMR.TargetVTCBoundingBoxXEnd = 255;
+            docVMR.TargetVTCBoundingBoxYStart = 1;
+            docVMR.TargetVTCBoundingBoxYEnd = 255;
+            docVMR.TargetVTCBoundingBoxZStart = 1;
+            docVMR.TargetVTCBoundingBoxZEnd = 255;
         else
-            vtcName = sprintf('s%i.vtc',i);
             docVMR.UseBoundingBoxForVTCCreation = 0;
         end
         docVMR.CreateVTCInACPCSpace(processedFMRs{i},IA,FA,ACPC,vtcName,vtcDataType,vtcResolution,vtcInterp,boundBoxThreshold);
     else
         docVMR.UseBoundingBoxForVTCCreation = 0;
-        vtcName = sprintf('s%i_TAL.vtc',i);
         docVMR.CreateVTCInTALSpace(processedFMRs{i},IA,FA,ACPC,TAL,vtcName,vtcDataType,vtcResolution,vtcInterp,boundBoxThreshold);
     end
     docVMR.Close;
