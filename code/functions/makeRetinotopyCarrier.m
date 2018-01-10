@@ -21,12 +21,14 @@
 
 function [ts, x, y] = makeRetinotopyCarrier(c)
 
+%dim: a 1x2 vector of the screen resolution in pixels, e.g., [1280 1024]
 dim = round(c.display.resolution);
 
 %AW 10.21.15: In the grid of x,y positions, the value 1 is set to the
 %edge of the screen on either the horizontal or vertical dimension.
 %Which one depends on whether we want the stimuli to go as far out as
-%possible, or be constrained by the smallest dimension.
+%possible (fitInScreen = false), or be constrained by the smallest
+%dimension (fitInScreen = true). 
 if c.carrier.fitInScreen
     prop = max(dim)/min(dim);
 else
@@ -42,17 +44,18 @@ else
     gridY = linspace(-prop,prop,dim(2));
 end
 
-%% KLUGE for initial setup at SLU (BMIC) 
+%%  for initial setup at SLU (BMIC) 
 % necessary to make all of stimulus visible. Only the top portion of the
 % screen was visible on 1/26/17. So the solution is to shrink the stimulus
 % down (by increasing prop from 1.33) and prop up the projector. 
-if strcmp(c.display.file,'display_scannerSLU_BigScreen.mat')
-    prop = 1.5; %was 1.6 on January 26, 2017 for AW
-    
-    gridX = linspace(-prop,prop,dim(1))*1024/768;
-    gridY = linspace(-prop,prop,dim(2));
-end
+% if strcmp(c.display.file,'display_scannerSLU_BigScreen.mat')
+%     prop = 1.5; %was 1.6 on January 26, 2017 for AW
+%     
+%     gridX = linspace(-prop,prop,dim(1))*1024/768;
+%     gridY = linspace(-prop,prop,dim(2));
+% end
 
+%% Make grid
 [x,y] = meshgrid(gridX,gridY);
 ang = atan2(y,x);
 rad = sqrt(x.^2+y.^2).^.5; %the square root expands rings at greater eccentricity
