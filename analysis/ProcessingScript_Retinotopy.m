@@ -5,8 +5,8 @@
 %This version has been updated for BrainVoyager Version 20, which has slightly different
 %commands to run via Matlab. 
 
-subj = 'VF';
-subjDate = 'VFNov28';
+subj = 'PZ';
+subjDate = 'PZMay14';
 [AnatomicalFile, FunctionalFiles, slices, TRsPerScan, oppPE, StimFiles] = getRetinotopyScanInfo(subjDate);
  
 subjSubjDate = fullfile(subj,subjDate);
@@ -77,7 +77,7 @@ for fi  = 1:numSets
         nfLocScans = nfLocScans + 1;
         nfLoc(fi) = nfLocScans;
     else
-        load(fn);
+         load(fn);
         if exist('stim','var')
             switch stim.type
                 case 'Rings'
@@ -311,6 +311,8 @@ pause
 vtcSpace = 'ACPC'; %'TAL'; 
 useBoundingBox = true;
 
+autoACPCWorked = true;
+
 VMR = fullfile(anatPath,'anat_SAG_IIHC.vmr'); %Important to load the native VMR not the ACPC or TAL
 
 if doDistCorr
@@ -335,10 +337,13 @@ else
     end
 end
 
-
-TAL = 'anat_SAG_IIHC_aACPC.tal';
-ACPC = 'anat_SAG_IIHC_aACPC.trf';
-
+if autoACPCWorked
+    TAL = 'anat_SAG_IIHC_aACPC.tal';
+    ACPC = 'anat_SAG_IIHC_aACPC.trf';
+else
+    TAL = 'anat_SAG_IIHC_ACPC.tal';
+    ACPC = 'anat_SAG_IIHC_ACPC.trf';
+end
 vtcDataType = 2; %1=integer 2-byte; 2=float
 vtcResolution = 3; %WHY?
 vtcInterp = 1; %0=nearest neighbor; 1=tilinear; 2=sinc

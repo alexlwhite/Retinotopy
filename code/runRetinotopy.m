@@ -36,10 +36,10 @@
 
 
 %% parameters specific to this session: 
-subj = 'XX';
+subj = 'PZ'; 
 
 %Increment this number for each scan: 
-scanNum = 1;
+scanNum = 6;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -48,7 +48,7 @@ nScans = length(scanOrder);
 
 %% MRI parameters
 
-MRI = false; %whether we're running in the magnet (determines calibration file)
+MRI = true; %whether we're running in the magnet (determines calibration file)
 
 TR  = 2;     %s
 
@@ -65,12 +65,11 @@ displayFile = sprintf('display_%s.mat',displayName);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = -1;  
+EYE = 1;  
 
 %% Task difficulty 
-fixtnDimProp = 0.3; %luminance of cross reduced by this proportion 
-checkerContrastDimProp = .42; %contrast of checkerboard reduced by this proportion
-
+fixtnDimProp = 0.35; %luminance of cross reduced by this proportion 
+checkerContrastDimProp = .58; %contrast of checkerboard reduced by this proportion
 
 %% set directories and path
 xFolder = retinotopyBase;
