@@ -36,10 +36,10 @@
 
 
 %% parameters specific to this session: 
-subj = 'PZ'; 
+subj = 'XX'; 
 
 %Increment this number for each scan: 
-scanNum = 6;
+scanNum = 3;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
@@ -48,7 +48,7 @@ nScans = length(scanOrder);
 
 %% MRI parameters
 
-MRI = true; %whether we're running in the magnet (determines calibration file)
+MRI = false; %whether we're running in the magnet (determines calibration file)
 
 TR  = 2;     %s
 
@@ -58,14 +58,14 @@ waitDummyScans = false; %whether to wait a few volumes before starting stimulus 
 if MRI
     displayName = 'scannerHSB';
 else
-    displayName = 'macbook';
+    displayName = 'office74';
 end
 
 displayFile = sprintf('display_%s.mat',displayName);
 
 %% Should we do eye-tracking?
 %-1 = no checking fixation; 0 = eyelink dummy mode (cursor as eye);  1 = full eyelink mode
-EYE = 1;  
+EYE = -1;  
 
 %% Task difficulty 
 fixtnDimProp = 0.35; %luminance of cross reduced by this proportion 
