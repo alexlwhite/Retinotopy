@@ -58,7 +58,7 @@ waitDummyScans = false; %whether to wait a few volumes before starting stimulus 
 if MRI
     displayName = 'scannerHSB';
 else
-    displayName = 'office74';
+    displayName = 'default';
 end
 
 displayFile = sprintf('display_%s.mat',displayName);
