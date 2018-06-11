@@ -24,7 +24,8 @@ while ~goodname
     else %don't add another number if not necessary
         datFile = fullfile(sFolder, filename);
     end
-    goodname = ~(isfile(sprintf('%s.mat',datFile)) || isfile(sprintf('%s.txt',datFile)) || isfile(sprintf('%s.edf',datFile)));
+    goodname = ~(exist(sprintf('%s.mat',datFile),'file') || exist(sprintf('%s.txt',datFile),'file') || exist(sprintf('%s.edf',datFile),'file'));
+
 end
 
 %eyelink file name

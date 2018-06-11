@@ -39,7 +39,7 @@
 subj = 'XX'; 
 
 %Increment this number for each scan: 
-scanNum = 3;
+scanNum = 1;
 
 %vector of scan types to run in this session:
 scanOrder = [1 2 3 1 2 3]; 
